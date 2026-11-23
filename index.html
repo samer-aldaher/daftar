@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>دفتر التحضير الذكي | أكاديمية EVA للتدريب</title>
+<meta name="description" content="أداة مجانية تحوّل التحضير اليومي للمعلم إلى دفتر تحضير مصمم بمقاس A4 جاهز للطباعة، من أكاديمية EVA للتدريب.">
+<meta property="og:title" content="دفتر التحضير الذكي – أكاديمية EVA">
+<meta property="og:description" content="الصق تحضيرك فيخرج دفتر التحضير جاهزًا للطباعة بصيغة PDF أو PNG. مجانًا.">
+<meta property="og:image" content="og.jpg">
+<meta name="theme-color" content="#2E7D32">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&family=Tajawal:wght@400;500;700&family=Noto+Naskh+Arabic:wght@500;600&display=swap">
+<style>
+/* Layout: one narrow working column — paste, fill, preview the real sheet, download; field review folded below */
+:root{
+  --bg:#F3F6F1; --surface:#FFFFFF; --fg:#1B2433; --muted:#5B6676; --line:#DCE3D8;
+  --accent:#2E7D32; --accent-ink:#FFFFFF; --warm:#E8590C; --warn-bg:#FFF4E5; --warn-fg:#8A4B00;
+  --font-display:"Baloo Bhaijaan 2","Tajawal",system-ui,sans-serif;
+  --font-body:"Tajawal",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121712; --surface:#1B221B; --fg:#E6ECE4; --muted:#9AA79A; --line:#2E3A2E;
+  --accent:#5DBB63; --accent-ink:#0E1A0F; --warm:#FF8A3D; --warn-bg:#3A2A12; --warn-fg:#FFD49A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121712; --surface:#1B221B; --fg:#E6ECE4; --muted:#9AA79A; --line:#2E3A2E;
+  --accent:#5DBB63; --accent-ink:#0E1A0F; --warm:#FF8A3D; --warn-bg:#3A2A12; --warn-fg:#FFD49A; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+header h1{font-family:var(--font-display);font-weight:700;font-size:1.75rem;margin:0;line-height:1.2;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+label.cap{font-weight:700;font-size:.95rem}
+.hint{color:var(--muted);font-size:.85rem}
+textarea,input,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;box-sizing:border-box}
+textarea{resize:vertical;line-height:1.7}
+#prep{min-height:200px}
+textarea:focus,input:focus,select:focus,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:inherit;font-weight:700;border-radius:10px;padding:11px 18px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.55;cursor:default}
+#status{font-size:.9rem;color:var(--muted);min-height:1.4em}
+.warn{background:var(--warn-bg);color:var(--warn-fg);border-radius:10px;padding:10px 12px;font-size:.9rem}
+.sheet{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgb(0 0 0/.12),0 8px 24px rgb(0 0 0/.08);overflow:hidden}
+.sheet img{display:block;width:100%;height:auto}
+details summary{cursor:pointer;font-weight:700;list-style-position:inside}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.fields .full{grid-column:1/-1}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f span{font-size:.85rem;font-weight:700}
+.f small{color:var(--muted);font-size:.78rem}
+.badge{display:inline-block;font-size:.75rem;font-weight:700;color:var(--warm);border:1px solid currentColor;border-radius:999px;padding:0 8px;margin-inline-start:6px}
+@media (max-width:520px){.fields{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-weight:500;font-size:.85rem;padding:6px 12px;border-radius:999px;background:var(--bg)}
+.filebtn span{display:inline-block;font-weight:700;border-radius:10px;padding:11px 18px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.filebtn input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.cr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.cr-item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cr-item p{margin:0;font-size:.9rem;color:var(--muted)}
+.cr-item button{align-self:flex-start;padding:6px 12px;font-size:.85rem}
+.cr-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cr-num{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.cr-flag{font-size:.75rem;font-weight:700;color:var(--warn-fg);background:var(--warn-bg);border-radius:999px;padding:1px 8px}
+.cr-review{border-color:var(--warm)}
+.cr-orig{white-space:pre-wrap;color:var(--fg)!important;background:var(--bg);border-radius:8px;padding:8px}
+.log{margin:0;padding-inline-start:20px;color:var(--muted);font-size:.88rem;display:flex;flex-direction:column;gap:2px}
+.log:empty{display:none}
+.top{display:flex;gap:14px;align-items:center}
+.brand{width:56px;height:56px;border-radius:12px;background:#fff;border:1px solid var(--line);flex:none}
+.report{font-size:.9rem;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.report p{margin:0}.report .orig{white-space:pre-wrap;color:var(--fg);background:var(--bg);border-radius:8px;padding:8px}
+.foot{color:var(--muted);font-size:.85rem;text-align:center}.foot p{margin:2px 0}
+#printImg{display:none}
+@media print{@page{size:A4;margin:0}body{background:#fff}.wrap{display:none!important}#printImg{display:block;width:210mm;height:297mm}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" dir="rtl">
+  <header class="top">
+    <img src="icon-192.png" alt="" class="brand" width="56" height="56">
+    <div>
+      <h1>دفتر التحضير الذكي</h1>
+      <p>الصق تحضيرك اليومي، فيتوزّع على دفتر التحضير الرسمي لأكاديمية EVA ويخرج جاهزًا للطباعة. مجاني، ويعمل على الهاتف والحاسوب.</p>
+    </div>
+  </header>
+
+  <section class="panel">
+    <label class="cap" for="prep">نص التحضير <span class="badge" id="sampleBadge">مثال</span></label>
+    <span class="hint">اكتب عنوان كل قسم في أول سطره متبوعًا بنقطتين، مثل «مخرجات التعلم:» أو «التقويم النهائي:». تستطيع نسخ النموذج الفارغ والكتابة فيه.</span>
+    <textarea id="prep"></textarea>
+    <div class="row">
+      <button class="primary" id="fillBtn">املأ الدفتر</button>
+      <button id="copyTplBtn" type="button">انسخ نموذج التحضير الفارغ</button>
+      <button id="clearBtn" type="button">مسح النص</button>
+    </div>
+    <span id="status" role="status"></span>
+    <div id="parseReport" class="report" hidden></div>
+  </section>
+
+  <div id="warnings" class="warn" hidden></div>
+
+  <section class="panel">
+    <div class="row" style="justify-content:space-between">
+      <div class="row"><label class="cap">الدفتر بعد التعبئة</label><label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="ruled" style="width:auto"> إظهار خطوط التسطير</label></div>
+      <div class="row">
+        <button id="pngBtn">تنزيل PNG</button>
+        <button id="pdfBtn">تنزيل PDF</button>
+        <button id="printBtn">طباعة</button>
+      </div>
+    </div>
+    <div class="sheet"><img id="out" alt="دفتر التحضير بعد التعبئة"></div>
+  </section>
+
+  <details class="panel" id="review">
+    <summary>مراجعة الحقول وتعديلها</summary>
+    <div class="fields" id="fields"></div>
+  </details>
+
+  <details class="panel" id="stylePanel">
+    <summary>التنسيق</summary>
+    <div class="fields">
+      <label class="f"><span>الخط</span>
+        <select id="fontSel">
+          <option value="Baloo Bhaijaan 2|600">خط مدوّر</option>
+          <option value="Tajawal|700">خط تجوال</option>
+          <option value="Noto Naskh Arabic|600">خط النسخ</option>
+        </select></label>
+      <label class="f"><span>حجم الخط</span>
+        <select id="sizeSel">
+          <option value="12">12</option><option value="13">13</option><option value="14" selected>14</option><option value="15">15</option><option value="16">16</option>
+        </select>
+        <small>يصغر الخط تلقائيًا في القسم الذي لا يتسع لنصه.</small></label>
+    </div>
+  </details>
+
+  <footer class="foot">
+    <p>نصوص تحضيرك لا تغادر جهازك: التعبئة والرسم والتنزيل تتم كلها داخل المتصفح.</p>
+    <p>تصميم: المدرب سامر الضاهر – أكاديمية EVA للتدريب</p>
+  </footer>
+</div>
+<img id="printImg" alt="">
+
+<script>
+const TEMPLATE_SRC = "template.jpg";
+const W = 2120, H = 3000;
+const INK = "#1F2A6B", RED = "#E0234E";
+const HEAD_RED = "#C62828", HEAD_BLUE = "#1565C0";
+
+/* ---------- field schema (labels, input type) ---------- */
+const SCHEMA = [
+  ["day","اليوم","line"],["date","التاريخ","line","مثال: 12/11/2026"],
+  ["grade","الصف","line"],["section","الشعبة","line"],
+  ["subject","المادة","line"],["title","عنوان الدرس","line"],
+  ["teacher","اسم المعلم","line","يظهر في تذييل الدفتر على سطر «تصميم المعلم/ة»"],
+  ["methods","طرائق التعلم","area","افصل بينها بفاصلة"],["resources","مصادر التعلم","area"],
+  ["warmup","التهيئة","area"],["warmup_min","مدة التهيئة (دقائق)","line"],
+  ["outcomes","مخرجات التعلم","area","هدف في كل سطر؛ لإضافة المدة اكتب في آخر السطر | 5"],
+  ["path","مسار الدرس","area","خطوة في كل سطر"],
+  ["formative","التقويم المرحلي","area","سؤال في كل سطر"],
+  ["final","التقويم النهائي","area","سؤال في كل سطر"],["final_min","مدة التقويم النهائي","line"],
+  ["closure","إغلاق الدرس","area"],["closure_min","مدة إغلاق الدرس","line"],
+  ["intro","نشاط للأقل تحصيلاً","area"],["gifted","نشاط للطالب المتميز","area"],
+];
+
+/* ---------- measured geometry on the 2120×3000 template ---------- */
+const L = (xl,xr,ys)=>ys.map(y=>({xl,xr,y}));
+const GEO = {
+  day:{lines:[{xl:1305,xr:1852,y:324}],size:50,single:true,color:HEAD_RED},
+  grade:{lines:[{xl:1305,xr:1852,y:465}],size:50,single:true,color:HEAD_RED},
+  section:{lines:[{xl:1305,xr:1842,y:532}],size:50,single:true,color:HEAD_RED},
+  subject:{lines:[{xl:1305,xr:1850,y:599}],size:50,single:true,color:HEAD_RED},
+  title:{lines:[{xl:1305,xr:1728,y:662}],size:50,single:true,color:HEAD_RED},
+  methods:{lines:[{xl:90,xr:960,y:323},{xl:90,xr:960,y:383}],size:50,para:true,color:HEAD_BLUE},
+  resources:{lines:[{xl:90,xr:960,y:447},{xl:90,xr:960,y:511}],size:50,para:true,color:HEAD_BLUE},
+  warmup:{lines:[{xl:90,xr:1050,y:578},{xl:240,xr:1050,y:648}],size:50,para:true,color:HEAD_BLUE},
+  path:{lines:L(84,1192,[921,974,1027,1080,1136,1189,1241,1295,1349,1403,1457,1512,1566,1620,1675,1731,1785,1839,1892]),size:50,marker:"num",flow:{y0:921,y1:1896}},
+  outcomes:{lines:[{xl:1405,xr:2046,y:925},...L(1364,2046,[980,1037,1093,1150,1205,1260,1318,1373])],size:50,marker:"dot",durX:1302,flow:{y0:925,y1:1400,badgeY:952,badgeXl:1405}},
+  formative:{lines:L(1268,2046,[1579,1628,1678,1727,1778,1828]),size:50,marker:"dot",flow:{y0:1579,y1:1848}},
+  final:{lines:L(1268,2046,[2034,2085,2137,2189,2240]),size:50,marker:"dot",flow:{y0:2034,y1:2266}},
+  closure:{lines:L(84,1192,[2096,2151,2206,2263]),size:50,marker:"auto",flow:{y0:2096,y1:2280}},
+  intro:{lines:L(692,1192,[2433,2487,2541,2596,2644]),size:46,marker:"auto",flow:{y0:2433,y1:2650}},
+  gifted:{lines:L(84,655,[2433,2487,2541,2596,2644]),size:46,marker:"auto",flow:{y0:2433,y1:2650}},
+};
+/* duration slots inside the printed "(....) د": dots box to cover, sample point for the ground colour */
+const DUR = {
+  warmup_min:{box:[144,640,54,24],probe:[170,632],cx:170,base:664},
+  closure_min:{box:[224,1990,58,24],probe:[252,1982],cx:252,base:2014},
+  final_min:{box:[1381,1938,56,24],probe:[1408,1930],cx:1408,base:1962},
+};
+const DATE = {segs:[[1742,1852],[1640,1724],[1500,1626]], y:394};
+/* teacher's name goes on «تصميم المعلم/ة» in the footer band; «توقيع المعلم» stays empty for the handwritten signature */
+const DESIGN_LINE = {xl:822,xr:1432,y:2893};
+
+/* ---------- example lesson (the teacher's own science lesson) ---------- */
+const SAMPLE_PREP = `المادة: العلوم
+عنوان الدرس: أكتشف عالمي 4
+طرائق التعلم: التعلم بالاكتشاف، الاستقراء والاستنتاج، المناقشة والحوار، التعلم التعاوني.
+مصادر التعلم: الكتاب المدرسي: صور الدرس ومجسماته، المواد والأشكال المعروضة في الأنشطة.
+التهيئة: توجيه سؤال للمتعلمين: هل تتشابه الأشياء المحيطة بنا في اللون والحجم والشكل والملمس، أم تختلف؟
+مخرجات التعلم:
+- أن يقارن المتعلم بين الأشياء المعروضة من حيث اللون والحجم والرائحة.
+- أن يستنتج أن الأشياء تتكون من مواد مختلفة.
+- أن يضع كل شكل في مكانه المناسب، مستنتجًا أن الأشياء تشغل حيزًا من الفراغ.
+مسار الدرس:
+1. عرض عنوان الدرس «أكتشف عالمي» ومناقشة الكلمة المفتاحية «المادة».
+2. مناقشة اختلاف المواد المحيطة بنا في الحجم واللون والشكل والملمس.
+3. تنفيذ نشاط «أجرّب وأستنتج» الأول، بملاحظة الأشياء المعروضة ومقارنتها من حيث اللون والحجم والرائحة.
+4. مناقشة نتائج المقارنة والتوصل إلى أن الأشياء تتكون من مواد مختلفة.
+5. تنفيذ نشاط «أجرّب وأستنتج» الثاني، بوضع كل شكل في المكان المناسب له.
+6. مناقشة الملاحظات والتوصل إلى أن الأشياء تشغل مكانًا من الفراغ.
+التقويم المرحلي:
+- قارن بين الأشياء المعروضة من حيث اللون والحجم والرائحة.
+- استنتج ممَّ تتكون الأشياء.
+- ضع كل شكل في المكان المناسب له، واستنتج ما تشغله الأشياء من الفراغ.
+التقويم النهائي:
+- بمَ تختلف المواد المحيطة بنا؟
+- قارن بين شيئين من حيث اللون والحجم والرائحة.
+- ممَّ تتكون الأشياء؟
+- ماذا تستنتج من وضع الأشكال في أماكنها المناسبة؟
+إغلاق الدرس: تلخيص الدرس بالتأكيد على أن المواد تختلف في الحجم واللون والشكل والملمس، وتتكون الأشياء من مواد مختلفة وتشغل حيزًا من الفراغ.
+نشاط تمهيدي: عرض الكلمة المفتاحية «المادة» على السبورة، ومطالبة المتعلمين بتسمية صفة ظاهرة في صور الدرس، كاللون أو الشكل.
+نشاط للطالب المتميز: اختيار شيئين ومقارنتهما من حيث الحجم واللون والشكل والملمس والرائحة، وتفسير اختلاف مواضع الأشكال في النشاط الثاني.`;
+
+const SAMPLE_DATA = {
+  day:"",date:"",grade:"",section:"",subject:"العلوم",title:"أكتشف عالمي 4",teacher:"",
+  methods:"التعلم بالاكتشاف، الاستقراء والاستنتاج، المناقشة والحوار، التعلم التعاوني.",
+  resources:"الكتاب المدرسي: صور الدرس ومجسماته، المواد والأشكال المعروضة في الأنشطة.",
+  warmup:"توجيه سؤال للمتعلمين: هل تتشابه الأشياء المحيطة بنا في اللون والحجم والشكل والملمس، أم تختلف؟",
+  warmup_min:"",
+  outcomes:"أن يقارن المتعلم بين الأشياء المعروضة من حيث اللون والحجم والرائحة.\nأن يستنتج أن الأشياء تتكون من مواد مختلفة.\nأن يضع كل شكل في مكانه المناسب، مستنتجًا أن الأشياء تشغل حيزًا من الفراغ.",
+  path:"عرض عنوان الدرس «أكتشف عالمي» ومناقشة الكلمة المفتاحية «المادة».\nمناقشة اختلاف المواد المحيطة بنا في الحجم واللون والشكل والملمس.\nتنفيذ نشاط «أجرّب وأستنتج» الأول، بملاحظة الأشياء المعروضة ومقارنتها من حيث اللون والحجم والرائحة.\nمناقشة نتائج المقارنة والتوصل إلى أن الأشياء تتكون من مواد مختلفة.\nتنفيذ نشاط «أجرّب وأستنتج» الثاني، بوضع كل شكل في المكان المناسب له.\nمناقشة الملاحظات والتوصل إلى أن الأشياء تشغل مكانًا من الفراغ.",
+  formative:"قارن بين الأشياء المعروضة من حيث اللون والحجم والرائحة.\nاستنتج ممَّ تتكون الأشياء.\nضع كل شكل في المكان المناسب له، واستنتج ما تشغله الأشياء من الفراغ.",
+  final:"بمَ تختلف المواد المحيطة بنا؟\nقارن بين شيئين من حيث اللون والحجم والرائحة.\nممَّ تتكون الأشياء؟\nماذا تستنتج من وضع الأشكال في أماكنها المناسبة؟",
+  final_min:"",
+  closure:"تلخيص الدرس بالتأكيد على أن المواد تختلف في الحجم واللون والشكل والملمس، وتتكون الأشياء من مواد مختلفة وتشغل حيزًا من الفراغ.",
+  closure_min:"",
+  intro:"عرض الكلمة المفتاحية «المادة» على السبورة، ومطالبة المتعلمين بتسمية صفة ظاهرة في صور الدرس، كاللون أو الشكل.",
+  gifted:"اختيار شيئين ومقارنتهما من حيث الحجم واللون والشكل والملمس والرائحة، وتفسير اختلاف مواضع الأشكال في النشاط الثاني."
+};
+
+/* ---------- UI ---------- */
+const $ = id=>document.getElementById(id);
+const fieldsEl = $("fields");
+for (const [key,label,kind,hint] of SCHEMA){
+  const wrap=document.createElement("label"); wrap.className="f"+(kind==="area"?" full":"");
+  const s=document.createElement("span"); s.textContent=label; wrap.append(s);
+  const el=document.createElement(kind==="area"?"textarea":"input"); el.id="f_"+key;
+  if(kind==="area") el.rows = ["path"].includes(key)?7:3;
+  el.addEventListener("input",scheduleRender); wrap.append(el);
+  if(hint){const h=document.createElement("small"); h.textContent=hint; wrap.append(h);}
+  fieldsEl.append(wrap);
+}
+$("prep").value = SAMPLE_PREP;
+$("prep").addEventListener("input",()=>{$("sampleBadge").hidden=true},{once:true});
+$("ruled").addEventListener("change",render);
+$("fontSel").addEventListener("change",async()=>{await loadFont();render()});
+function setData(d){for(const [k] of SCHEMA){$("f_"+k).value=(d[k]??"").toString()}}
+function getData(){const d={};for(const [k] of SCHEMA)d[k]=$("f_"+k).value.trim();return d}
+setData(SAMPLE_DATA);
+
+/* ---------- rendering ---------- */
+const canvas=document.createElement("canvas"); canvas.width=W; canvas.height=H;
+const ctx=canvas.getContext("2d");
+const tpl=new Image();
+const tplReady=new Promise(r=>{tpl.onload=r; tpl.src=TEMPLATE_SRC});
+let FONT="Baloo Bhaijaan 2", WEIGHT="600";
+async function loadFont(){
+  [FONT,WEIGHT]=$("fontSel").value.split("|");
+  try{await Promise.all([document.fonts.load(`${WEIGHT} 40px "${FONT}"`,"أبجد"),document.fonts.load(`800 40px "Baloo Bhaijaan 2"`,"أبجد"),document.fonts.load(`700 40px "Baloo Bhaijaan 2"`,"أبجد")]);}catch(e){}
+}
+const fontStr=s=>`${WEIGHT} ${s}px "${FONT}", "Tajawal", "Noto Naskh Arabic", sans-serif`;
+const toLatinDigits=s=>s.replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d));
+
+function items(key,val){
+  const g=GEO[key];
+  if(!val) return [];
+  if(g.para||g.single) return [val.replace(/\s*\n\s*/g," ")];
+  return val.split(/\n+/).map(s=>s.replace(/^\s*(?:[-•*▪●◦]|\d+\s*[-.)]|[٠-٩]+\s*[-.)])\s*/,"").trim()).filter(Boolean);
+}
+function splitDur(t){const m=t.match(/^(.*?)\s*\|\s*([\d٠-٩]+)\s*(?:د|دقيقة|دقائق)?\s*$/);return m?[m[1],toLatinDigits(m[2])]:[t,""]}
+
+/* ---------- design layer: customisations applied on top of the template ---------- */
+const freshDesign=()=>({global:{},fields:{},borders:{},headings:{},decos:[]});
+let design=freshDesign();
+try{ const s=localStorage.getItem("lp-design-v1"); if(s) design=Object.assign(freshDesign(), JSON.parse(s)); }catch(e){}
+function saveDesign(){ try{ localStorage.setItem("lp-design-v1", JSON.stringify(design)); }catch(e){} }
+const PX_PER_PT=50/14, PX_PER_MM=W/210;
+const GROUPS={ header_right:["day","date","grade","section","subject","title"], header_left:["methods","resources","warmup"],
+  body:["outcomes","path","formative","final","closure","intro","gifted"], footer:["teacher"] };
+const FONTS={"Baloo Bhaijaan 2":"400;500;600;700;800","Tajawal":"400;500;700;800","Noto Naskh Arabic":"400;500;600;700","Cairo":"400;600;700;800",
+  "Amiri":"400;700","Reem Kufi":"400;500;600;700","Changa":"400;500;600;700;800","El Messiri":"400;500;600;700","Lalezar":"400","Aref Ruqaa":"400;700",
+  "Almarai":"400;700;800","Lemonada":"400;500;600;700","Readex Pro":"400;500;600;700","Noto Kufi Arabic":"400;500;600;700;800","IBM Plex Sans Arabic":"400;500;600;700",
+  "Markazi Text":"400;500;600;700","Lateef":"400;500;600;700;800","Scheherazade New":"400;500;600;700"};
+const loadedFonts=new Set(["Baloo Bhaijaan 2","Tajawal","Noto Naskh Arabic"]);
+async function ensureFont(name){
+  if(!FONTS[name]) return false;
+  if(!loadedFonts.has(name)){
+    const l=document.createElement("link"); l.rel="stylesheet";
+    l.href=`https://fonts.googleapis.com/css2?family=${name.replace(/ /g,"+")}:wght@${FONTS[name]}&display=swap`;
+    document.head.append(l); loadedFonts.add(name);
+    await new Promise(r=>{l.onload=r; l.onerror=r; setTimeout(r,4000)});
+  }
+  try{ await Promise.race([document.fonts.load(`400 40px "${name}"`,"أبجد"), new Promise(r=>setTimeout(r,4000))]); }catch(e){}
+  return true;
+}
+function styleOf(key){ return Object.assign({}, design.global||{}, (design.fields||{})[key]||{}); }
+const fontFor=(st,size)=>`${st.weight||WEIGHT} ${size}px "${st.font||FONT}", "Tajawal", "Noto Naskh Arabic", sans-serif`;
+const sizeFor=(st,dflt)=>st.sizePt?Math.round(st.sizePt*PX_PER_PT):dflt;
+
+/* greedy word-wrap of items across the field's lines; returns null if it doesn't fit */
+function layout(g,list,size,st){
+  ctx.font=fontFor(st||{},size);
+  const useMarker = g.marker==="num"||g.marker==="dot"||(g.marker==="auto"&&list.length>1);
+  const mW = useMarker ? (g.marker==="num"? Math.max(size*1.15, ctx.measureText(list.length+".").width+size*0.4) : size*0.75) : 0;
+  const out=[]; let li=0;
+  for(let i=0;i<list.length;i++){
+    const words=list[i].text.split(/\s+/); let cur="", first=true, start=li;
+    const avail=()=>g.lines[li].xr-g.lines[li].xl-mW;
+    for(const w of words){
+      if(li>=g.lines.length) return null;
+      const test=cur?cur+" "+w:w;
+      if(ctx.measureText(test).width<=avail()||!cur){ cur=test; if(ctx.measureText(cur).width>avail()) return null; }
+      else { out.push({li,text:cur,marker:first&&useMarker?i:null,mW}); first=false; li++; cur=w;
+             if(li>=g.lines.length) return null; if(ctx.measureText(cur).width>avail()) return null; }
+    }
+    if(li>=g.lines.length) return null;
+    out.push({li,text:cur,marker:first&&useMarker?i:null,mW}); li++;
+    list[i].startLine=start;
+  }
+  return out;
+}
+/* line grids other than the template's own: custom line spacing, or extra lines for a crowded field */
+function spacedLines(g,factor){
+  const ys=g.lines.map(l=>l.y); if(ys.length<2) return g.lines;
+  const step=(ys[ys.length-1]-ys[0])/(ys.length-1)*factor, last=g.flow?g.flow.y1:ys[ys.length-1];
+  const out=[]; for(let y=ys[0],i=0; y<=last+0.5 && i<40; y+=step,i++){ const s=g.lines[Math.min(i,g.lines.length-1)]; out.push({xl:s.xl,xr:s.xr,y:Math.round(y)}); }
+  return out;
+}
+function flowLines(g,n){ const {y0,y1}=g.flow, out=[]; for(let i=0;i<n;i++){ const y=Math.round(y0+(y1-y0)*i/(n-1)); out.push({xl:(g.flow.badgeY&&y<g.flow.badgeY)?g.flow.badgeXl:g.lines[0].xl,xr:g.lines[0].xr,y}); } return out; }
+
+/* ---------- fitting: size limits per field kind (1 pt = 50/14 px on the A4 canvas) ---------- */
+const FIT={ list:{comfortPt:12,floorPt:10}, para:{comfortPt:11,floorPt:9}, single:{comfortPt:8,floorPt:7} };
+function fitKind(g){ return g.single?"single":g.para?"para":"list"; }
+function limitsFor(key){
+  const g0=GEO[key], st=styleOf(key), base=sizeFor(st,g0.size), k=FIT[fitKind(g0)];
+  if(g0.single) return {base,comfort:Math.round(base*0.6),floor:Math.round(base*0.5)};
+  return {base, comfort:Math.min(base,Math.round(k.comfortPt*PX_PER_PT)), floor:Math.min(Math.round(base*0.85),Math.round(k.floorPt*PX_PER_PT))};
+}
+function candidatesFor(key){
+  const g0=GEO[key], st=styleOf(key), ruled=$("ruled").checked;
+  const ls=st.lineSpacing||(st.sizePt>14?st.sizePt/14*0.96:null);
+  const cands=[{g:(ls&&!ruled&&!g0.single&&!g0.para)?{...g0,lines:spacedLines(g0,ls)}:g0, cap:false}];
+  if(g0.flow&&!ruled) for(let n=g0.lines.length+1;n<=14;n++) cands.push({g:{...g0,lines:flowLines(g0,n)},cap:true});
+  return cands;
+}
+const capOf=(c,base)=>{ const L=c.g.lines, sp=L.length>1?(L[L.length-1].y-L[0].y)/(L.length-1):999; return Math.min(base,Math.floor(sp*(c.cap?0.74:0.93))); };
+/* largest size >= floor at which the whole field fits; overflow=true when it doesn't fit even at the floor */
+function planField(key,val){
+  const g0=GEO[key]; const raw=items(key,val); if(!raw.length) return null;
+  const st=styleOf(key), lim=limitsFor(key);
+  const list=raw.map(t=>{const [x,d]=key==="outcomes"?splitDur(t):[t,""];return {text:x,dur:d}});
+  let best=null;
+  for(const c of candidatesFor(key)){
+    for(let s=capOf(c,lim.base); s>=lim.floor; s--){ if(best&&s<=best.size) break; const r=layout(c.g,list,s,st); if(r){best={g:c.g,size:s,placed:r};break;} }
+  }
+  if(best) return {...best,list,st,lim,overflow:false,tight:best.size<lim.comfort};
+  let bestP={g:g0,placed:[]};   // over capacity: show as many whole items as the roomiest line grid allows
+  for(const c of candidatesFor(key)){ if(capOf(c,lim.base)<lim.floor) continue; const r=layoutPartial(c.g,list,lim.floor,st); if(r.length>bestP.placed.length) bestP={g:c.g,placed:r}; }
+  return {g:bestP.g,size:lim.floor,placed:bestP.placed,list,st,lim,overflow:true,tight:true};
+}
+/* how much text the field holds comfortably: lines and characters per line at the comfort size */
+function capacityOf(key){
+  const g0=GEO[key], st=styleOf(key), lim=limitsFor(key);
+  let c=candidatesFor(key).filter(c=>capOf(c,lim.base)>=lim.comfort).pop()||candidatesFor(key)[0];
+  ctx.font=fontFor(st,lim.comfort);
+  const sampleTxt="تنفيذ نشاط الملاحظة ومقارنة الأشياء المعروضة من حيث اللون والحجم";
+  const cw=ctx.measureText(sampleTxt).width/sampleTxt.length;
+  const mW=g0.marker?lim.comfort*0.9:0;
+  const avgW=c.g.lines.reduce((a,l)=>a+(l.xr-l.xl-mW),0)/c.g.lines.length;
+  return {lines:c.g.lines.length, charsPerLine:Math.floor(avgW/cw)};
+}
+function drawField(key,val,warn){
+  const P=planField(key,val); if(!P) return;
+  const g0=GEO[key], {g,size,placed,list,st}=P;
+  const C=st.color||g0.color||INK, align=st.align||(g0.single?"center":"right"), dir=st.dir||"rtl";
+  ctx.font=fontFor(st,size); ctx.fillStyle=C; ctx.textBaseline="alphabetic";
+  for(const p of placed){
+    const ln=g.lines[p.li], baseY=ln.y-11;
+    if(p.marker!==null){
+      if(g0.marker==="num"){ ctx.direction="ltr"; ctx.textAlign="right"; ctx.fillStyle=st.bulletColor||st.color||INK; ctx.fillText(".", ln.xr, baseY); ctx.fillText(String(p.marker+1), ln.xr-ctx.measureText(".").width, baseY); }
+      else { ctx.fillStyle=st.bulletColor||RED; ctx.beginPath(); ctx.arc(ln.xr-size*0.22, baseY-size*0.3, size*0.13, 0, Math.PI*2); ctx.fill(); }
+      ctx.fillStyle=C;
+    }
+    ctx.direction=dir;
+    const xr=ln.xr-p.mW;
+    if(align==="center"){ ctx.textAlign="center"; ctx.fillText(p.text,(ln.xl+xr)/2,baseY); }
+    else if(align==="left"){ ctx.textAlign="left"; ctx.fillText(p.text,ln.xl,baseY); }
+    else { ctx.textAlign="right"; ctx.fillText(p.text,xr,baseY); }
+  }
+  if(g0.durX){ ctx.font=fontFor(st,Math.min(size,44)); ctx.direction="rtl"; ctx.textAlign="center";
+    for(const it of list){ if(!it.dur||it.startLine==null||it.startLine>=g.lines.length) continue;
+      let y=g.lines[it.startLine].y; if(y<952&&g.lines[it.startLine+1]) y=g.lines[it.startLine+1].y;
+      ctx.fillText(`${it.dur} د`, g0.durX, y-11); } }
+  if(P.overflow) warn.push(SCHEMA.find(s=>s[0]===key)[1]);
+}
+function layoutPartial(g,list,size,st){ // draw what fits when the field is over capacity
+  for(let n=list.length;n>0;n--){const r=layout(g,list.slice(0,n),size,st); if(r) return r;}
+  const w=list[0].text.split(/\s+/);
+  for(let k=w.length-1;k>0;k--){const r=layout(g,[{text:w.slice(0,k).join(" ")+" …"}],size,st); if(r) return r;}
+  return [];
+}
+function drawDur(key,val){
+  const v=toLatinDigits((val||"").replace(/[^\d٠-٩]/g,"")); if(!v) return;
+  const d=DUR[key]; const px=ctx.getImageData(d.probe[0],d.probe[1],1,1).data;
+  ctx.fillStyle=`rgb(${px[0]},${px[1]},${px[2]})`; ctx.fillRect(...d.box);
+  const st=key==="warmup_min"?styleOf("warmup"):styleOf(key==="final_min"?"final":"closure");
+  ctx.font=fontFor(st,42); ctx.fillStyle=key==="warmup_min"?(st.color||HEAD_BLUE):INK; ctx.direction="ltr"; ctx.textAlign="center"; ctx.fillText(v,d.cx,d.base);
+}
+function drawDate(val){
+  if(!val) return; const st=styleOf("date"), b=sizeFor(st,46);
+  ctx.fillStyle=st.color||HEAD_RED; ctx.direction="ltr"; ctx.textAlign="center";
+  const parts=toLatinDigits(val).split(/[\/\-.\s]+/).filter(Boolean);
+  if(parts.length===3){
+    let [a,bb,c]=parts; if(a.length===4) [a,bb,c]=[c,bb,a];
+    const vals=[a,bb,c];
+    DATE.segs.forEach(([x0,x1],i)=>{ let s=b; ctx.font=fontFor(st,s); while(ctx.measureText(vals[i]).width>x1-x0-6&&s>20){s--;ctx.font=fontFor(st,s)} ctx.fillText(vals[i],(x0+x1)/2,DATE.y-12); });
+  } else { let s=b; ctx.font=fontFor(st,s); while(ctx.measureText(val).width>260&&s>18){s--;ctx.font=fontFor(st,s)} ctx.direction="rtl"; ctx.fillText(val,(DATE.segs[0][1]+DATE.segs[2][0])/2,DATE.y-12); }
+}
+
+/* sections of the printed template: outer frame, heading text box (dark text / light text), free content area */
+const SECTIONS={
+  header:{name:"الترويسة العلوية",box:[40,245,2080,718],content:[60,265,2060,705]},
+  path:{name:"مسار الدرس",box:[50,728,1224,1930],head:[580,762,912,836,"dark"],headL:450,content:[70,860,1210,1910]},
+  outcomes:{name:"مخرجات التعلم",box:[1231,728,2075,1430],head:[1408,766,2044,830,"dark"],content:[1250,870,2060,1415]},
+  formative:{name:"التقويم المرحلي",box:[1231,1440,2075,1872],head:[1544,1464,1894,1522,"dark"],content:[1250,1540,2060,1860]},
+  final:{name:"التقويم النهائي",box:[1231,1879,2075,2288],head:[1660,1908,1980,1968,"dark"],content:[1250,1995,2060,2275]},
+  closure:{name:"إغلاق الدرس",box:[50,1937,1224,2680],head:[600,1960,896,2026,"dark"],content:[70,2060,1210,2300]},
+  intro:{name:"نشاط للأقل تحصيلاً",frame:"closure",head:[694,2306,1090,2372,"dark"],content:[690,2405,1210,2665]},
+  gifted:{name:"نشاط للطالب المتميز",frame:"closure",head:[224,2306,640,2372,"dark"],content:[70,2405,655,2665]},
+  evaluator:{name:"ملاحظات الشخص المقيم",box:[1231,2305,2075,2677],head:[1452,2306,1998,2372,"light"],content:[1250,2400,2060,2665]},
+  footer:{name:"تذييل الصفحة",content:[50,2700,2080,2990]},
+};
+const hexRgb=h=>{h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");const n=parseInt(h,16);return [n>>16&255,n>>8&255,n&255]};
+const isHex=h=>typeof h==="string"&&/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(h);
+function rgb2hsv(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;
+  if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return [h,mx?d/mx:0,mx]}
+function hsv2rgb(h,s,v){const c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c;let r,g,b;
+  [r,g,b]=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];return [(r+m)*255,(g+m)*255,(b+m)*255]}
+const hueDist=(a,b)=>{const d=Math.abs(a-b)%360;return d>180?360-d:d};
+function recolorFrame(x,box,hex){
+  const [x0,y0,x1,y1]=box,w=x1-x0+1,h=y1-y0+1,S=24, img=x.getImageData(x0,y0,w,h),d=img.data;
+  const probe=(xx,yy)=>{const i=(yy*w+xx)*4;return rgb2hsv(d[i],d[i+1],d[i+2])};
+  const ref=[probe(5,h>>1),probe(w-6,h>>1),probe(w>>1,5)].filter(p=>p[1]>0.3).map(p=>p[0]);
+  const [th,ts,tv]=rgb2hsv(...hexRgb(hex));
+  for(let yy=0;yy<h;yy++) for(let xx=0;xx<w;xx++){
+    if(xx>=S&&yy>=S&&xx<w-S&&yy<h-S) continue;
+    const i=(yy*w+xx)*4,[hh,ss,vv]=rgb2hsv(d[i],d[i+1],d[i+2]);
+    if(ss>0.28&&vv>0.2&&(!ref.length||ref.some(r=>hueDist(r,hh)<22))){
+      const [r,g,b]=hsv2rgb(th,Math.min(1,ss*0.4+ts*0.6),Math.min(1,vv*0.5+tv*0.5)); d[i]=r;d[i+1]=g;d[i+2]=b; }
+  }
+  x.putImageData(img,x0,y0);
+}
+function recolorHeading(x,hd,hex){
+  const [x0,y0,x1,y1,mode]=hd,w=x1-x0,h=y1-y0,img=x.getImageData(x0,y0,w,h),d=img.data,[tr,tg,tb]=hexRgb(hex);
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2],lum=.299*r+.587*g+.114*b,[hh,ss,vv]=rgb2hsv(r,g,b); let a=0;
+    if(mode==="dark"){ if(ss<0.35||(hh>200&&hh<265)) a=lum<60?1:lum<125?(125-lum)/65:0; if(ss>0.55&&vv>0.45&&(hh<14||hh>338)) a=1; }
+    else if(ss<0.22) a=lum>225?1:lum>150?(lum-150)/75:0;
+    if(a>0){ d[i]=r*(1-a)+tr*a; d[i+1]=g*(1-a)+tg*a; d[i+2]=b*(1-a)+tb*a; }
+  }
+  x.putImageData(img,x0,y0);
+}
+
+/* the template's dotted writing lines, erased when «إظهار خطوط التسطير» is off (evaluator, signature and date lines stay) */
+const RULES = [
+  [82,971,323],[81,1237,383],[81,971,447],[81,1237,511],[81,1062,578],[233,1237,648],
+  [1301,1859,324],[1301,1858,465],[1301,1849,532],[1301,1857,599],[1301,1735,662],
+  ...[921,974,1027,1080,1136,1189,1241,1295,1349,1403,1457,1512,1566,1620,1675,1731,1785,1839,1892,2096,2151,2206,2263].map(y=>[78,1197,y]),
+  ...[2433,2487,2541,2596,2644].flatMap(y=>[[78,662,y],[678,1197,y]]),
+  [1396,2051,925], ...[980,1037,1093,1150,1205,1260,1318,1373].flatMap(y=>[[1260,1340,y],[1354,2051,y]]),
+  ...[1579,1628,1678,1727,1778,1828,2034,2085,2137,2189,2240].map(y=>[1260,2051,y]),
+];
+let unruled=null, baseCache={key:"",canvas:null};
+function baseSheet(){
+  const ruled=$("ruled").checked, key=ruled+"|"+JSON.stringify(design.borders)+"|"+JSON.stringify(design.headings);
+  if(baseCache.key===key) return baseCache.canvas;
+  const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d",{willReadFrequently:true});
+  if(ruled) x.drawImage(tpl,0,0,W,H); else { unruled=unruled||buildUnruled(); x.drawImage(unruled,0,0); }
+  for(const [sec,col] of Object.entries(design.borders||{})){ const S=SECTIONS[sec]; const box=S&&(S.box||SECTIONS[S.frame]?.box); if(box&&isHex(col)) recolorFrame(x,box,col); }
+  for(const [sec,col] of Object.entries(design.headings||{})){ const hd=SECTIONS[sec]?.head; if(hd&&hd[4]!=="drawn"&&isHex(col)) recolorHeading(x,hd,col); }
+  baseCache={key,canvas:c}; return c;
+}
+/* decorations: emoji icons, AI-drawn illustrations, uploaded pictures */
+const decoCache=new Map();
+function decoImage(dc){
+  if(!decoCache.has(dc.id)) decoCache.set(dc.id,new Promise(res=>{const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(null);
+    im.src=dc.kind==="svg"?"data:image/svg+xml;charset=utf-8,"+encodeURIComponent(dc.svg):dc.src;}));
+  return decoCache.get(dc.id);
+}
+function placeRect(sec,place,w,h){
+  const S=SECTIONS[sec]||SECTIONS.path, [cx0,cy0,cx1,cy1]=S.content, m=16;
+  if((place==="heading-left"||place==="heading-right")&&S.head){ const hd=S.head, cy=(hd[1]+hd[3])/2;
+    return place==="heading-left"?[(S.headL||hd[0])-14-w,cy-h/2]:[hd[2]+14,cy-h/2]; }
+  const P={"top-right":[cx1-m-w,cy0+m],"top-left":[cx0+m,cy0+m],"bottom-right":[cx1-m-w,cy1-m-h],"bottom-left":[cx0+m,cy1-m-h],"center":[(cx0+cx1-w)/2,(cy0+cy1-h)/2]};
+  return P[place]||P["bottom-left"];
+}
+async function drawDecos(){
+  for(const dc of design.decos||[]){
+    const size=Math.max(30,Math.min(900,(dc.sizeMm||10)*PX_PER_MM));
+    if(dc.kind==="emoji"){
+      const [x,y]=placeRect(dc.section,dc.place,size,size);
+      ctx.font=`${Math.round(size*0.9)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+      ctx.direction="ltr"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillStyle="#000"; ctx.fillText(dc.text,x+size/2,y+size/2); ctx.textBaseline="alphabetic";
+    } else {
+      const im=await decoImage(dc); if(!im) continue;
+      const ratio=(im.naturalHeight||1)/(im.naturalWidth||1), w=size, h=size*ratio, [x,y]=placeRect(dc.section,dc.place,w,h);
+      ctx.drawImage(im,x,y,w,h);
+    }
+  }
+}
+function buildUnruled(){
+  const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d",{willReadFrequently:true});
+  x.drawImage(tpl,0,0,W,H);
+  const isLine=(d,i)=>{const R=d[i],G=d[i+1],B=d[i+2]; return (B-R>28&&B>110&&B-G>8)||(R+G+B<300);};
+  for(const [x0,x1,y] of RULES){
+    const top=y-7, h=15, w=x1-x0, P=6;            // band around the line, plus clean rows above and below it
+    const img=x.getImageData(x0,top-P,w,h+2*P), d=img.data, W2=w;
+    for(let col=0;col<w;col++){
+      const iu=(0*W2+col)*4, il=((h+2*P-1)*W2+col)*4;
+      for(let r=P;r<P+h;r++){ const i=(r*W2+col)*4; if(!isLine(d,i)) continue;
+        const t=(r-P+1)/(h+1);                        // interpolate the ground (paper or watermark) from above/below
+        d[i]=d[iu]*(1-t)+d[il]*t; d[i+1]=d[iu+1]*(1-t)+d[il+1]*t; d[i+2]=d[iu+2]*(1-t)+d[il+2]*t; }
+    }
+    x.putImageData(img,x0,top-P);
+  }
+  return c;
+}
+function drawFooter(name){
+  if(!name) return;
+  const st=styleOf("teacher"), {xl,xr,y}=DESIGN_LINE; let s=sizeFor(st,46); ctx.font=fontFor(st,s);
+  while(ctx.measureText(name).width>xr-xl&&s>26){s--;ctx.font=fontFor(st,s)}
+  ctx.direction="rtl"; ctx.textAlign="center"; ctx.fillStyle=st.color||INK; ctx.fillText(name,(xl+xr)/2,y-20);
+}
+let lastBlobUrl=null, renderTimer=null;
+function scheduleRender(){clearTimeout(renderTimer);renderTimer=setTimeout(render,250)}
+async function render(){
+  await tplReady;
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H);
+  ctx.drawImage(baseSheet(),0,0);
+  const d=getData(), warn=[];
+  for(const k of Object.keys(GEO)) drawField(k,d[k],warn);
+  drawDate(d.date);
+  drawFooter(d.teacher);
+  for(const k of Object.keys(DUR)) drawDur(k,d[k]);
+  await drawDecos();
+  const w=$("warnings");
+  if(warn.length){ w.textContent=`النص أطول من مساحة: ${warn.join("، ")}، فلم يُكتب كاملًا. اختصره من «مراجعة الحقول وتعديلها».`; w.hidden=false; }
+  else w.hidden=true;
+  canvas.toBlob(b=>{ if(!b) return; if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl); lastBlobUrl=URL.createObjectURL(b); $("out").src=lastBlobUrl; },"image/png");
+}
+
+/* ---------- توزيع التحضير على الحقول بلا ذكاء اصطناعي: يتعرّف على عناوين الأقسام ---------- */
+const FIELD_NAMES=Object.fromEntries(SCHEMA.map(([k,l])=>[k,l]));
+const ALIASES={
+  day:["اليوم"], date:["التاريخ"], grade:["الصف","الصف الدراسي"], section:["الشعبة","الشعبه","الفصل"],
+  subject:["المادة","المادة الدراسية"], title:["عنوان الدرس","الدرس","موضوع الدرس","الموضوع"],
+  teacher:["اسم المعلم","اسم المعلمة","المعلم","المعلمة","تصميم المعلم","تصميم المعلمة","تصميم المعلم/ة","إعداد"],
+  methods:["طرائق التعلم","طرائق التعليم","طرائق التدريس","طرق التدريس","الطرائق","استراتيجيات التدريس","استراتيجيات التعلم","الاستراتيجيات","استراتيجيات التعليم"],
+  resources:["مصادر التعلم","مصادر التعليم","الوسائل التعليمية","الوسائل","الوسائل والأدوات","الأدوات","المصادر","مصادر التعلم والوسائل"],
+  warmup:["التهيئة","التمهيد","التهيئة الحافزة","تهيئة","المقدمة","التهيئة والتمهيد"],
+  outcomes:["مخرجات التعلم","الأهداف","أهداف الدرس","نواتج التعلم","الأهداف السلوكية","الأهداف التعليمية","الأهداف المراد تحقيقها","الأهداف الخاصة"],
+  path:["مسار الدرس","سير الدرس","خطوات الدرس","العرض","إجراءات التدريس","إجراءات الدرس","الإجراءات","خطوات التنفيذ","سير الحصة","الأنشطة التعليمية"],
+  formative:["التقويم المرحلي","التقويم التكويني","التقويم البنائي","تقويم مرحلي","التقويم المستمر"],
+  final:["التقويم النهائي","التقويم الختامي","التقويم الإجمالي","التقويم الإجمالي النهائي","تقويم نهائي","التقويم"],
+  closure:["إغلاق الدرس","غلق الدرس","الغلق","الخاتمة","الختام","خاتمة الدرس"],
+  intro:["نشاط للأقل تحصيلاً","نشاط للأقل تحصيلا","نشاط علاجي","النشاط العلاجي","الأنشطة العلاجية","نشاط تمهيدي","نشاط للطلاب المتعثرين","العلاج"],
+  gifted:["نشاط للطالب المتميز","نشاط للطلاب المتميزين","نشاط إثرائي","النشاط الإثرائي","الأنشطة الإثرائية","الإثراء","نشاط للمتميزين"],
+  dayDate:["اليوم والتاريخ","التاريخ واليوم"],
+  extra:["الواجب","الواجب المنزلي","الواجبات","ملاحظات","ملاحظات المعلم","المراجع"],
+};
+const normAr=s=>s.replace(/[ً-ٰٟـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/\s+/g," ").trim();
+const ALIAS_LIST=Object.entries(ALIASES).flatMap(([k,arr])=>arr.map(a=>[normAr(a),k])).sort((a,b)=>b[0].length-a[0].length);
+const DUR_RE=/\(?\s*(?:المدة\s*[:：]?\s*)?([\d٠-٩]{1,3})\s*(?:د|دق|دقيقة|دقائق)\s*\)?/;
+function headingOf(line){
+  const raw=line.replace(/^\s*(?:[-•*#▪●◦]+|\d+\s*[-.)]|[٠-٩]+\s*[-.)])?\s*/,"");
+  const n=normAr(raw);
+  for(const [a,k] of ALIAS_LIST){
+    if(!n.startsWith(a)) continue;
+    const rest=n.slice(a.length);
+    if(rest===""||/^\s*(\([^)]*\))?\s*[:：\-–]/.test(rest)||/^\s*\([^)]*\)\s*$/.test(rest)){
+      const ci=raw.search(/[:：]/), di=raw.search(/\s[-–]\s/);
+      const cut=ci>=0?ci+1:(di>=0?di+2:raw.length);
+      const head=raw.slice(0,cut), body=raw.slice(cut).trim();
+      const dm=head.match(DUR_RE);
+      return {key:k, body, dur:dm?dm[1]:""};
+    }
+  }
+  return null;
+}
+function parsePrep(text){
+  const out={}, durs={}, unknown=[]; let cur=null;
+  for(const line of text.split(/\r?\n/)){
+    if(!line.trim()) continue;
+    const h=headingOf(line);
+    if(h){ cur=h.key; out[cur]=out[cur]||[]; if(h.body) out[cur].push(h.body); if(h.dur) durs[cur]=h.dur; continue; }
+    if(cur) out[cur].push(line.trim()); else unknown.push(line.trim());
+  }
+  const d={}; for(const [k] of SCHEMA) d[k]="";
+  const lineOf=v=>v.replace(/^\s*(?:[-•*▪●◦]|\d+\s*[-.)]|[٠-٩]+\s*[-.)])\s*/,"");
+  for(const [k,lines] of Object.entries(out)){
+    if(k==="extra") continue;
+    if(k==="dayDate"){ const t=lines.join(" "); const m=t.match(/[\d٠-٩]{1,4}\s*[\/\-.]\s*[\d٠-٩]{1,2}\s*[\/\-.]\s*[\d٠-٩]{1,4}/); if(m){ d.date=m[0].replace(/\s+/g,""); d.day=t.replace(m[0],"").replace(/[،,\-–]/g," ").trim(); } else d.day=t; continue; }
+    if(!(k in d)) continue;
+    let ls=lines.map(lineOf).filter(Boolean);
+    // a separate «المدة: 5» line inside a section
+    ls=ls.filter(l=>{ const m=normAr(l).match(/^المده\s*[:：]?\s*([\d٠-٩]{1,3})/); if(m){ durs[k]=m[1]; return false; } return true; });
+    if(k==="outcomes") ls=ls.map(l=>{ const m=l.match(/^(.*?)[\s\-–،,]*\(?\s*([\d٠-٩]{1,3})\s*(?:د|دق|دقيقة|دقائق)\s*\)?\s*$/); return m&&m[1]?`${m[1].trim()} | ${toLatinDigits(m[2])}`:l; });
+    const g=GEO[k];
+    d[k]=(g&&(g.para||g.single))||k==="teacher"||k==="date"||k==="day" ? ls.join(" ") : ls.join("\n");
+  }
+  // header facts written without a colon, e.g. «الصف الثاني - شعبة أ»
+  for(const l of unknown){ const n=l.replace(/[\u064B-\u065F]/g,"");
+    const g=n.match(/^\s*الصف\s+([^\-–،,:]+)/); if(g&&!d.grade) d.grade=g[1].trim();
+    const s=n.match(/شعب[ةه]\s*[:：]?\s*([^\s\-–،,]+)/); if(s&&!d.section) d.section=s[1].trim(); }
+  const extra=(out.extra||[]);
+  for(const [k,v] of Object.entries(durs)){ const t=k+"_min"; if(t in d&&!d[t]) d[t]=toLatinDigits(v); }
+  if(d.date) d.date=toLatinDigits(d.date);
+  return {data:d, unknown:unknown.filter(l=>!/^\s*الصف\s/.test(l.replace(/[\u064B-\u065F]/g,""))), extra};
+}
+const PREP_TEMPLATE=`اليوم:
+التاريخ:
+الصف:
+الشعبة:
+المادة:
+عنوان الدرس:
+اسم المعلم:
+طرائق التعلم:
+مصادر التعلم:
+التهيئة (5 د):
+مخرجات التعلم:
+- أن ... (5 د)
+مسار الدرس:
+1.
+التقويم المرحلي:
+-
+التقويم النهائي (10 د):
+-
+إغلاق الدرس (5 د):
+نشاط للأقل تحصيلاً:
+نشاط للطالب المتميز:`;
+function showReport(d,unknown,extra){
+  const box=$("parseReport"); box.replaceChildren();
+  const main=SCHEMA.filter(([k])=>!k.endsWith("_min"));
+  const filled=main.filter(([k])=>d[k]).map(([,l])=>l), empty=main.filter(([k])=>!d[k]).map(([,l])=>l);
+  const p1=document.createElement("p"); p1.textContent=`وُزِّع ${filled.length} قسمًا.`+(empty.length?` لم يُذكر في النص: ${empty.join("، ")}.`:""); box.append(p1);
+  if(unknown.length){
+    const det=document.createElement("details"); const sm=document.createElement("summary");
+    sm.textContent=`${unknown.length} سطرًا قبل أول عنوان لم يُعرف قسمها`; const pre=document.createElement("p"); pre.className="orig"; pre.textContent=unknown.join("\n");
+    det.append(sm,pre); box.append(det);
+  }
+  if(extra.length){ const p2=document.createElement("p"); p2.textContent="لا مكان له في الدفتر فلم يُكتب: "+extra.join("؛ "); box.append(p2); }
+  box.hidden=false;
+}
+$("fillBtn").addEventListener("click", async ()=>{
+  const text=$("prep").value.trim();
+  if(!text){ $("status").textContent="الصق نص التحضير أولًا."; return; }
+  const {data,unknown,extra}=parsePrep(text);
+  if(!SCHEMA.some(([k])=>data[k])){ $("status").textContent="لم أجد عناوين أقسام في النص. اكتب كل قسم بعنوانه، مثل «مخرجات التعلم:»، أو انسخ النموذج الفارغ."; $("parseReport").hidden=true; return; }
+  $("sampleBadge").hidden=true;
+  setData(data); await render(); showReport(data,unknown,extra);
+  $("status").textContent="تمّت التعبئة. راجع الدفتر، ويمكنك تعديل أي قسم من «مراجعة الحقول وتعديلها».";
+});
+$("copyTplBtn").addEventListener("click", async ()=>{
+  try{ await navigator.clipboard.writeText(PREP_TEMPLATE); $("status").textContent="نُسخ النموذج. الصقه في أي مكان واكتب تحضيرك تحت العناوين."; }
+  catch(e){ $("prep").value=PREP_TEMPLATE; $("sampleBadge").hidden=true; $("status").textContent="وُضع النموذج في مربع النص. اكتب تحضيرك تحت العناوين."; }
+});
+$("clearBtn").addEventListener("click",()=>{ $("prep").value=""; $("sampleBadge").hidden=true; $("prep").focus(); });
+/* text size */
+try{ const z=design.global?.sizePt; if(z) $("sizeSel").value=String(z); }catch(e){}
+$("sizeSel").addEventListener("change",()=>{ const v=Number($("sizeSel").value); if(v===14) delete design.global.sizePt; else design.global.sizePt=v; saveDesign(); render(); });
+
+/* ---------- downloads & print ---------- */
+function baseName(){ const t=$("f_title").value.trim().replace(/[\\/:*?"<>|]+/g,"").slice(0,60); return "تحضير"+(t?" - "+t:""); }
+function save(filename, blob){
+  const url=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=url; a.download=filename; document.body.append(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),10000); $("status").textContent="تم التنزيل.";
+}
+$("pngBtn").addEventListener("click", async ()=>{ await render(); canvas.toBlob(b=>b&&save(baseName()+".png",b),"image/png"); });
+/* A4 PDF holding the sheet as one JPEG page, built here so it works offline and needs no library */
+function jpegPdf(dataURL,pw,ph){
+  const bin=atob(dataURL.split(",")[1]), jpg=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) jpg[i]=bin.charCodeAt(i);
+  const enc=s=>new TextEncoder().encode(s), parts=[], offs=[]; let len=0;
+  const push=b=>{ parts.push(b); len+=b.length; };
+  const obj=(n,body)=>{ offs[n]=len; push(enc(`${n} 0 obj\n`)); body.forEach(push); push(enc("\nendobj\n")); };
+  const cs=`q 595.28 0 0 841.89 0 0 cm /Im0 Do Q`;
+  push(enc("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n"));
+  obj(1,[enc("<< /Type /Catalog /Pages 2 0 R >>")]);
+  obj(2,[enc("<< /Type /Pages /Kids [3 0 R] /Count 1 >>")]);
+  obj(3,[enc("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>")]);
+  obj(4,[enc(`<< /Type /XObject /Subtype /Image /Width ${pw} /Height ${ph} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`),jpg,enc("\nendstream")]);
+  obj(5,[enc(`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`)]);
+  const x=len; let t="xref\n0 6\n0000000000 65535 f \n"; for(let n=1;n<=5;n++) t+=String(offs[n]).padStart(10,"0")+" 00000 n \n";
+  push(enc(t+`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${x}\n%%EOF`));
+  return new Blob(parts,{type:"application/pdf"});
+}
+$("pdfBtn").addEventListener("click", async ()=>{
+  await render(); save(baseName()+".pdf", jpegPdf(canvas.toDataURL("image/jpeg",0.93),W,H));
+});
+$("printBtn").addEventListener("click", async ()=>{
+  await render(); const im=$("printImg");
+  await new Promise(r=>{ im.onload=r; im.src=canvas.toDataURL("image/jpeg",0.95); });
+  window.print();
+});
+if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
+loadFont().then(render);
+document.fonts?.ready?.then(()=>render());
+</script>
+</body>
+</html>
