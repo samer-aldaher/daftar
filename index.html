@@ -80,9 +80,70 @@ details summary{cursor:pointer;font-weight:700;list-style-position:inside}
 .report{font-size:.9rem;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 .report p{margin:0}.report .orig{white-space:pre-wrap;color:var(--fg);background:var(--bg);border-radius:8px;padding:8px}
 .foot{color:var(--muted);font-size:.85rem;text-align:center}.foot p{margin:2px 0}
-#printImg{display:none}
-@media print{@page{size:A4;margin:0}body{background:#fff}.wrap{display:none!important}#printImg{display:block;width:210mm;height:297mm}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ---------- v2: navigation, archive, week, bank, settings ---------- */
+[hidden]{display:none!important}
+:root{--danger:#B3261E;--chip-on:#E3F1E4;--shadow:0 1px 2px rgb(0 0 0/.06),0 6px 18px rgb(0 0 0/.06)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--danger:#FF8A80;--chip-on:#21402A;--shadow:none}}
+:root[data-theme="dark"]{--danger:#FF8A80;--chip-on:#21402A;--shadow:none}
+h2{font-family:var(--font-display);font-size:1.25rem;font-weight:700;margin:0;line-height:1.3}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;box-shadow:var(--shadow)}
+.tabs button{border:0;background:transparent;padding:8px 2px;border-radius:10px;font-size:.88rem;display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.3;color:var(--muted)}
+.tabs .ti{font-size:1.1rem;line-height:1.2}
+.tabs button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.view{display:flex;flex-direction:column;gap:18px}
+.lessonbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--chip-on);border-radius:12px;padding:10px 14px}
+.lb-text{display:flex;flex-direction:column;min-width:0}
+.lb-text strong{font-size:.98rem;overflow-wrap:anywhere}
+.actions{border-top:1px solid var(--line);padding-top:12px}
+button.ghost{background:transparent;border-color:transparent;color:var(--accent);padding:8px 10px}
+button.danger-soft{color:var(--danger)}
+button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+button.sm{padding:6px 12px;font-size:.85rem}
+.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:560px){.filters{grid-template-columns:1fr 1fr}.filters .f:last-child:nth-child(odd){grid-column:1/-1}}
+.f.inline{flex-direction:row;align-items:center;gap:8px}
+.cards{display:flex;flex-direction:column;gap:10px}
+.grp{font-weight:700;color:var(--muted);font-size:.9rem;margin:6px 4px 0}
+.card{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;min-width:0}
+.card img{width:58px;height:82px;object-fit:cover;border-radius:6px;flex:none;border:1px solid var(--line)}
+.card .cb{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.card h3{margin:0;font-size:1rem;line-height:1.4;overflow-wrap:anywhere}
+.card .meta{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+.card .row{gap:6px}
+.empty{color:var(--muted);text-align:center;padding:24px 8px}
+.days{display:flex;flex-direction:column;gap:12px}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.day-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.day-h strong{font-family:var(--font-display);font-size:1.05rem}
+.wl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.wl .wt{flex:1;min-width:160px;font-size:.92rem;overflow-wrap:anywhere}
+.wl .wt small{display:block;color:var(--muted)}
+.wl select{width:auto;padding:6px 8px;font-size:.85rem}
+.day .add{display:flex;gap:8px;flex-wrap:wrap}
+.day .add select{flex:1;min-width:180px}
+.bk-items{display:flex;flex-wrap:wrap;gap:8px}
+.bk-item{font-weight:500;font-size:.9rem;padding:8px 12px;border-radius:999px;background:var(--bg);text-align:start;line-height:1.4}
+.bk-item[aria-pressed="true"]{background:var(--chip-on);border-color:var(--accent);color:var(--fg);box-shadow:inset 0 0 0 1px var(--accent)}
+.bk-item.mine{border-style:dashed}
+.chip[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sig-pad-wrap{position:relative;border:2px dashed var(--line);border-radius:12px;background:#fff;touch-action:none}
+#sigPad{display:block;width:100%;height:190px;cursor:crosshair;touch-action:none}
+.sig-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9aa3ad;pointer-events:none;font-size:1.1rem}
+.sig-saved{display:flex;flex-direction:column;gap:8px}
+.sig-prev{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;justify-content:center}
+.sig-prev img{max-height:110px;max-width:100%}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:12px;font-weight:700;font-size:.92rem;box-shadow:0 6px 20px rgb(0 0 0/.25);max-width:calc(100vw - 32px);text-align:center}
+.toast.err{background:var(--danger);color:#fff}
+dialog#tplDlg{border:0;border-radius:16px;padding:12px;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--surface);color:var(--fg);box-sizing:border-box}
+dialog#tplDlg::backdrop{background:rgb(0 0 0/.55)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.dlg-img{background:#fff;border-radius:8px;overflow:auto;max-height:calc(100dvh - 170px)}
+.dlg-img img{display:block;width:100%;height:auto}
+.dlg-foot{justify-content:space-between;margin-top:10px}
+#printArea{display:none}
+.tpl-card .nos{font-size:.68rem;color:var(--muted);font-weight:500}
+@media print{@page{size:A4;margin:0}body{background:#fff}.wrap,.toast,dialog{display:none!important}#printArea{display:block}#printArea img{display:block;width:210mm;height:297mm;break-after:page;page-break-after:always}}
 </style>
 </head>
 <body>
@@ -95,62 +156,234 @@ details summary{cursor:pointer;font-weight:700;list-style-position:inside}
     </div>
   </header>
 
-  <section class="panel">
-    <label class="cap" for="prep">نص التحضير <span class="badge" id="sampleBadge">مثال</span></label>
-    <span class="hint">اكتب عنوان كل قسم في أول سطره متبوعًا بنقطتين، مثل «مخرجات التعلم:» أو «التقويم النهائي:». تستطيع نسخ النموذج الفارغ والكتابة فيه.</span>
-    <textarea id="prep"></textarea>
-    <div class="row">
-      <button class="primary" id="fillBtn">املأ الدفتر</button>
-      <button id="copyTplBtn" type="button">انسخ نموذج التحضير الفارغ</button>
-      <button id="clearBtn" type="button">مسح النص</button>
-    </div>
-    <span id="status" role="status"></span>
-    <div id="parseReport" class="report" hidden></div>
-  </section>
+  <nav class="tabs" id="tabs" aria-label="أقسام التطبيق">
+    <button type="button" data-view="editor" aria-current="page"><span class="ti" aria-hidden="true">✎</span>الدفتر</button>
+    <button type="button" data-view="archive"><span class="ti" aria-hidden="true">▤</span>دروسي</button>
+    <button type="button" data-view="week"><span class="ti" aria-hidden="true">▦</span>الأسبوع</button>
+    <button type="button" data-view="bank"><span class="ti" aria-hidden="true">✦</span>البنك</button>
+    <button type="button" data-view="settings"><span class="ti" aria-hidden="true">⚙</span>الإعدادات</button>
+  </nav>
 
-  <div id="warnings" class="warn" hidden></div>
-
-  <section class="panel">
-    <div class="row" style="justify-content:space-between">
-      <div class="row"><label class="cap">الدفتر بعد التعبئة</label><label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="ruled" style="width:auto"> إظهار خطوط التسطير</label></div>
+  <!-- ============ الدفتر ============ -->
+  <div class="view" id="view-editor">
+    <div class="lessonbar" id="lessonBar">
+      <div class="lb-text"><strong id="lbTitle">درس جديد</strong><span id="lbSub" class="hint"></span></div>
       <div class="row">
+        <button type="button" id="newLessonBtn">درس جديد</button>
+      </div>
+    </div>
+
+    <section class="panel">
+      <label class="cap" for="prep">نص التحضير <span class="badge" id="sampleBadge">مثال</span></label>
+      <span class="hint">اكتب عنوان كل قسم في أول سطره متبوعًا بنقطتين، مثل «مخرجات التعلم:» أو «التقويم النهائي:». تستطيع نسخ النموذج الفارغ والكتابة فيه.</span>
+      <textarea id="prep"></textarea>
+      <div class="row">
+        <button class="primary" id="fillBtn">املأ الدفتر</button>
+        <button id="copyTplBtn" type="button">انسخ نموذج التحضير الفارغ</button>
+        <button id="clearBtn" type="button">مسح النص</button>
+        <button id="toBankBtn" type="button">من بنك الأنشطة</button>
+      </div>
+      <span id="status" role="status"></span>
+      <div id="parseReport" class="report" hidden></div>
+    </section>
+
+    <div id="warnings" class="warn" hidden></div>
+
+    <section class="panel">
+      <div class="row" style="justify-content:space-between">
+        <div class="row"><label class="cap">الدفتر بعد التعبئة</label><label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="ruled" style="width:auto"> إظهار خطوط التسطير</label></div>
+        <button type="button" id="tplPreviewBtn" class="ghost">معاينة القوالب</button>
+      </div>
+      <div class="tpl-gallery" id="tplGallery" role="radiogroup" aria-label="القالب"></div>
+      <div class="sheet"><img id="out" alt="دفتر التحضير بعد التعبئة"></div>
+      <div class="row actions">
+        <button class="primary" id="saveLessonBtn" type="button">حفظ في دروسي</button>
+        <button id="saveCopyBtn" type="button" hidden>حفظ كنسخة جديدة</button>
         <button id="pngBtn">تنزيل PNG</button>
         <button id="pdfBtn">تنزيل PDF</button>
         <button id="printBtn">طباعة</button>
       </div>
-    </div>
-    <div class="tpl-gallery" id="tplGallery" role="radiogroup" aria-label="القالب"></div>
-    <div class="sheet"><img id="out" alt="دفتر التحضير بعد التعبئة"></div>
-  </section>
+    </section>
 
-  <details class="panel" id="review">
-    <summary>مراجعة الحقول وتعديلها</summary>
-    <div class="fields" id="fields"></div>
-  </details>
+    <details class="panel" id="review">
+      <summary>مراجعة الحقول وتعديلها</summary>
+      <div class="fields" id="fields"></div>
+    </details>
 
-  <details class="panel" id="stylePanel">
-    <summary>التنسيق</summary>
-    <div class="fields">
-      <label class="f"><span>الخط</span>
-        <select id="fontSel">
-          <option value="Baloo Bhaijaan 2|600">خط مدوّر</option>
-          <option value="Tajawal|700">خط تجوال</option>
-          <option value="Noto Naskh Arabic|600">خط النسخ</option>
-        </select></label>
-      <label class="f"><span>حجم الخط</span>
-        <select id="sizeSel">
-          <option value="12">12</option><option value="13">13</option><option value="14" selected>14</option><option value="15">15</option><option value="16">16</option>
-        </select>
-        <small>يصغر الخط تلقائيًا في القسم الذي لا يتسع لنصه.</small></label>
-    </div>
-  </details>
+    <details class="panel" id="stylePanel">
+      <summary>التنسيق</summary>
+      <div class="fields">
+        <label class="f"><span>الخط</span>
+          <select id="fontSel">
+            <option value="Baloo Bhaijaan 2|600">خط مدوّر</option>
+            <option value="Tajawal|700">خط تجوال</option>
+            <option value="Noto Naskh Arabic|600">خط النسخ</option>
+          </select></label>
+        <label class="f"><span>حجم الخط</span>
+          <select id="sizeSel">
+            <option value="12">12</option><option value="13">13</option><option value="14" selected>14</option><option value="15">15</option><option value="16">16</option>
+          </select>
+          <small>يصغر الخط تلقائيًا في القسم الذي لا يتسع لنصه.</small></label>
+      </div>
+    </details>
+  </div>
+
+  <!-- ============ دروسي السابقة ============ -->
+  <div class="view" id="view-archive" hidden>
+    <section class="panel">
+      <div class="row" style="justify-content:space-between">
+        <h2>دروسي السابقة</h2>
+        <span class="hint" id="arCount"></span>
+      </div>
+      <input type="search" id="arSearch" placeholder="ابحث بعنوان الدرس أو المادة أو أي كلمة في التحضير">
+      <div class="filters">
+        <label class="f"><span>المادة</span><select id="arSubject"><option value="">كل المواد</option></select></label>
+        <label class="f"><span>الصف</span><select id="arGrade"><option value="">كل الصفوف</option></select></label>
+        <label class="f"><span>الترتيب</span>
+          <select id="arSort">
+            <option value="updated">آخر تعديل</option>
+            <option value="date">تاريخ الدرس</option>
+            <option value="subject">حسب المادة</option>
+            <option value="grade">حسب الصف</option>
+          </select></label>
+      </div>
+    </section>
+    <div id="arList" class="cards"></div>
+    <p class="empty" id="arEmpty" hidden>لا توجد دروس محفوظة بعد. املأ الدفتر ثم اضغط «حفظ في دروسي»، فيظهر الدرس هنا.</p>
+  </div>
+
+  <!-- ============ تحضير الأسبوع ============ -->
+  <div class="view" id="view-week" hidden>
+    <section class="panel">
+      <h2>تحضير الأسبوع</h2>
+      <div class="filters">
+        <label class="f"><span>الأسبوع</span><select id="wkSel"></select></label>
+        <label class="f"><span>أول يوم في الأسبوع (الأحد)</span><input type="date" id="wkStart"></label>
+        <label class="f"><span>اسم الأسبوع</span><input id="wkLabel" placeholder="مثال: الأسبوع الثالث – الفصل الأول"></label>
+      </div>
+      <div class="row">
+        <button type="button" id="wkNewBtn">أسبوع جديد</button>
+        <button type="button" id="wkDelBtn" class="danger-soft">حذف هذا الأسبوع</button>
+      </div>
+      <span class="hint">لكل يوم دروسه، ولكل درس قالبه. التاريخ واليوم يُكتبان في الدرس تلقائيًا من تاريخ بداية الأسبوع.</span>
+    </section>
+    <div id="wkDays" class="days"></div>
+    <section class="panel">
+      <div class="row">
+        <button class="primary" type="button" id="wkPdfBtn">تنزيل الأسبوع PDF</button>
+        <button type="button" id="wkPrintBtn">طباعة الأسبوع</button>
+      </div>
+      <span id="wkStatus" class="hint" role="status"></span>
+    </section>
+  </div>
+
+  <!-- ============ بنك الأنشطة ============ -->
+  <div class="view" id="view-bank" hidden>
+    <section class="panel">
+      <h2>بنك الأنشطة التربوية</h2>
+      <span class="hint">اختر قسمًا، ثم اضغط العناصر التي تريدها. تظهر في المربع أدناه لتعدّلها قبل إدراجها في الدفتر.</span>
+      <div class="chips" id="bkCats" role="tablist"></div>
+    </section>
+    <section class="panel">
+      <div class="bk-items" id="bkItems"></div>
+      <div class="row">
+        <input id="bkNew" placeholder="أضف عنصرًا خاصًا بك إلى هذا القسم" style="flex:1;min-width:200px">
+        <button type="button" id="bkAddBtn">إضافة</button>
+      </div>
+    </section>
+    <section class="panel">
+      <label class="cap" for="bkText">ما سيُدرج في الدفتر <span class="hint" id="bkSel"></span></label>
+      <textarea id="bkText" rows="5" placeholder="اختر عناصر من الأعلى، أو اكتب هنا مباشرة"></textarea>
+      <div class="filters">
+        <label class="f"><span>يُدرج في قسم</span><select id="bkTarget"></select></label>
+        <label class="f"><span>طريقة الإدراج</span>
+          <select id="bkMode"><option value="append">إضافة إلى ما كُتب في القسم</option><option value="replace">استبدال محتوى القسم</option></select></label>
+      </div>
+      <div class="row">
+        <button class="primary" type="button" id="bkInsertBtn">أدرج في الدفتر</button>
+        <button type="button" id="bkClearBtn">إلغاء الاختيار</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ الإعدادات ============ -->
+  <div class="view" id="view-settings" hidden>
+    <section class="panel">
+      <h2>بياناتي الثابتة</h2>
+      <span class="hint">تُكتب تلقائيًا في كل درس جديد، ويمكنك تعديلها في أي درس. تُحفظ على جهازك فقط.</span>
+      <div class="fields">
+        <label class="f"><span>اسم المعلم/ة</span><input id="pf_teacher" autocomplete="name"></label>
+        <label class="f"><span>اسم المدرسة</span><input id="pf_school"><small>يُحفظ مع دروسك. لا يوجد له مكان في القوالب الحالية.</small></label>
+        <label class="f"><span>الصف الافتراضي</span><input id="pf_grade" placeholder="مثال: الأول"></label>
+        <label class="f"><span>الشعبة الافتراضية</span><input id="pf_section" placeholder="مثال: أ"></label>
+        <label class="f"><span>المادة الافتراضية</span><input id="pf_subject" placeholder="مثال: اللغة العربية"></label>
+        <label class="f"><span>الحصة الافتراضية</span><input id="pf_period" placeholder="مثال: الثانية"></label>
+        <label class="f full"><span>المواد التي أدرّسها</span><input id="pf_subjects" placeholder="افصل بينها بفاصلة: اللغة العربية، الرياضيات، العلوم"><small>تظهر اقتراحاتٍ عند كتابة المادة.</small></label>
+      </div>
+      <div class="row">
+        <button class="primary" type="button" id="pfSaveBtn">حفظ بياناتي</button>
+        <button type="button" id="pfApplyBtn">اكتبها في الدرس الحالي</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>توقيعي الشخصي</h2>
+      <span class="hint">ارسم توقيعك بإصبعك أو بالفأرة، أو ارفع صورة توقيعك على ورقة بيضاء. يوضع في خانة «توقيع المعلم» في القوالب التي فيها هذه الخانة.</span>
+      <div class="sig-pad-wrap"><canvas id="sigPad" aria-label="لوحة رسم التوقيع"></canvas><span class="sig-ph" id="sigPh">وقّع هنا</span></div>
+      <div class="row">
+        <label class="f inline"><span>لون الحبر</span>
+          <select id="sigInk" style="width:auto"><option value="#1A3A8F">أزرق</option><option value="#111111">أسود</option></select></label>
+        <button type="button" id="sigClearBtn">مسح اللوحة</button>
+        <button class="primary" type="button" id="sigSaveBtn">حفظ التوقيع المرسوم</button>
+        <label class="filebtn"><input type="file" id="sigUp" accept="image/*" hidden><span>رفع صورة توقيع</span></label>
+      </div>
+      <div class="sig-saved" id="sigSaved" hidden>
+        <span class="cap">التوقيع المحفوظ</span>
+        <div class="sig-prev"><img id="sigPrev" alt="التوقيع المحفوظ"></div>
+        <div class="row">
+          <label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="sigAuto" style="width:auto" checked> إدراج التوقيع تلقائيًا في الدفتر</label>
+          <button type="button" id="sigDelBtn" class="danger-soft">حذف التوقيع</button>
+        </div>
+        <small class="hint" id="sigNote"></small>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>المظهر</h2>
+      <label class="f"><span>الوضع</span>
+        <select id="themeSel" style="max-width:260px"><option value="system">حسب إعداد الجهاز</option><option value="light">فاتح</option><option value="dark">ليلي</option></select>
+        <small>يغيّر شكل التطبيق فقط؛ الدفتر المطبوع يبقى بألوانه.</small></label>
+    </section>
+
+    <section class="panel">
+      <h2>النسخة الاحتياطية</h2>
+      <span class="hint">بياناتك محفوظة على هذا الجهاز وحده. نزّل نسخة احتياطية من حين لآخر، واسترجعها إذا غيّرت هاتفك أو مسحت بيانات المتصفح.</span>
+      <div class="row">
+        <button class="primary" type="button" id="bkpExportBtn">تنزيل نسخة احتياطية</button>
+        <label class="filebtn"><input type="file" id="bkpImport" accept=".json,application/json" hidden><span>استرجاع من نسخة احتياطية</span></label>
+      </div>
+      <span class="hint" id="storageInfo"></span>
+    </section>
+  </div>
 
   <footer class="foot">
-    <p>نصوص تحضيرك لا تغادر جهازك: التعبئة والرسم والتنزيل تتم كلها داخل المتصفح.</p>
+    <p>بياناتك لا تغادر جهازك: التعبئة والحفظ والرسم والتنزيل تتم كلها داخل المتصفح.</p>
     <p>تصميم: المدرب سامر الضاهر – أكاديمية EVA للتدريب</p>
   </footer>
 </div>
-<img id="printImg" alt="">
+
+<dialog id="tplDlg" dir="rtl" aria-labelledby="tplDlgName">
+  <div class="dlg-head"><strong id="tplDlgName"></strong><button type="button" id="tplDlgClose" class="ghost" aria-label="إغلاق">✕</button></div>
+  <div class="dlg-img"><img id="tplDlgImg" alt=""></div>
+  <div class="row dlg-foot">
+    <button type="button" id="tplDlgNext">› التالي</button>
+    <button class="primary" type="button" id="tplDlgPick">اختر هذا القالب</button>
+    <button type="button" id="tplDlgPrev">السابق ‹</button>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="printArea"></div>
 
 <script>
 const TEMPLATE_SRC = "template.jpg", TEMPLATE2_SRC = "template-purple.jpg", TEMPLATE_SCI1_SRC = "template-sci1.jpg", TEMPLATE_SCI2_SRC = "template-sci2.jpg", TEMPLATE_AR_SRC = "template-arabic.jpg", TEMPLATE_COL_SRC = "template-colorful.jpg", TEMPLATE_TEAL_SRC = "template-teal.jpg";
@@ -728,7 +961,7 @@ function buildUnruled(){
   return c;
 }
 function drawFooter(name){
-  if(!name) return;
+  if(!name||!DESIGN_LINE) return;
   const st=styleOf("teacher"), {xl,xr,y}=DESIGN_LINE; let s=sizeFor(st,46); ctx.font=fontFor(st,s);
   while(ctx.measureText(name).width>xr-xl&&s>26){s--;ctx.font=fontFor(st,s)}
   ctx.direction="rtl"; ctx.textAlign="center"; ctx.fillStyle=st.color||INK; ctx.fillText(name,(xl+xr)/2,y-20);
@@ -745,6 +978,7 @@ async function render(){
   drawDate(d.date,DATE); if(TEMPLATES[TPL_ID]?.HIJRI) drawDate(d.hijri,TEMPLATES[TPL_ID].HIJRI);
   drawFooter(d.teacher);
   for(const k of Object.keys(DUR)) drawDur(k,d[k]);
+  if(typeof drawSignature==="function") await drawSignature();
   await drawDecos();
   const w=$("warnings");
   if(warn.length){ w.textContent=`النص أطول من مساحة: ${warn.join("، ")}، فلم يُكتب كاملًا. اختصره من «مراجعة الحقول وتعديلها».`; w.hidden=false; }
@@ -753,9 +987,12 @@ async function render(){
 }
 
 /* ---------- template gallery ---------- */
-const THUMBS={teal:"thumb-teal.jpg",green:"thumb-green.jpg",purple:"thumb-purple.jpg",sci1:"thumb-sci1.jpg",sci2:"thumb-sci2.jpg",arabic:"thumb-arabic.jpg",colorful:"thumb-colorful.jpg"};
+/* ---------- two more versions of the green and purple sheets, aligned to the same layout ---------- */
+TEMPLATES.green3={...TEMPLATES.green,id:"green3",name:"الأخضر الثاني",src:"template-green3.jpg",DESIGN_LINE:null};
+TEMPLATES.purple2={...TEMPLATES.purple,id:"purple2",name:"البنفسجي الثاني",src:"template-purple2.jpg",DESIGN_LINE:null};
+const THUMBS={green3:"thumb-green3.jpg",purple2:"thumb-purple2.jpg",teal:"thumb-teal.jpg",green:"thumb-green.jpg",purple:"thumb-purple.jpg",sci1:"thumb-sci1.jpg",sci2:"thumb-sci2.jpg",arabic:"thumb-arabic.jpg",colorful:"thumb-colorful.jpg"};
 function markGallery(){ for(const b of $("tplGallery").children) b.setAttribute("aria-checked",String(b.dataset.id===TPL_ID)); }
-for(const id of ["green","purple","sci1","sci2","arabic","colorful","teal"]){
+for(const id of ["green","green3","purple","purple2","sci1","sci2","arabic","colorful","teal"]){
   const b=document.createElement("button"); b.type="button"; b.className="tpl-card"; b.dataset.id=id; b.setAttribute("role","radio");
   const im=document.createElement("img"); im.src=THUMBS[id]; im.alt=""; const t=document.createElement("span"); t.textContent=TEMPLATES[id].name;
   b.append(im,t); b.addEventListener("click",async()=>{ await switchTemplate(id); markGallery(); }); $("tplGallery").append(b);
@@ -877,6 +1114,7 @@ $("fillBtn").addEventListener("click", async ()=>{
   const {data,unknown,extra}=parsePrep(text);
   if(!SCHEMA.some(([k])=>data[k])){ $("status").textContent="لم أجد عناوين أقسام في النص. اكتب كل قسم بعنوانه، مثل «مخرجات التعلم:»، أو انسخ النموذج الفارغ."; $("parseReport").hidden=true; return; }
   $("sampleBadge").hidden=true;
+  if(typeof applyDefaults==="function") applyDefaults(data);
   setData(data); await render(); showReport(data,unknown,extra);
   $("status").textContent="تمّت التعبئة. راجع الدفتر، ويمكنك تعديل أي قسم من «مراجعة الحقول وتعديلها».";
 });
@@ -891,40 +1129,436 @@ $("sizeSel").addEventListener("change",()=>{ const v=Number($("sizeSel").value);
 
 /* ---------- downloads & print ---------- */
 function baseName(){ const t=$("f_title").value.trim().replace(/[\\/:*?"<>|]+/g,"").slice(0,60); return "تحضير"+(t?" - "+t:""); }
-function save(filename, blob){
+function save(filename, blob, msg){
   const url=URL.createObjectURL(blob), a=document.createElement("a");
   a.href=url; a.download=filename; document.body.append(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),10000); $("status").textContent="تم التنزيل.";
+  setTimeout(()=>URL.revokeObjectURL(url),20000);
+  $("status").textContent="تم التنزيل.";
+  if(typeof toast==="function") toast(msg||"تم التنزيل: "+filename);
 }
 $("pngBtn").addEventListener("click", async ()=>{ await render(); canvas.toBlob(b=>b&&save(baseName()+".png",b),"image/png"); });
-/* A4 PDF holding the sheet as one JPEG page, built here so it works offline and needs no library */
-function jpegPdf(dataURL,pw,ph){
-  const bin=atob(dataURL.split(",")[1]), jpg=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) jpg[i]=bin.charCodeAt(i);
+/* A4 PDF, one JPEG per page, built here so it works offline and needs no library */
+function jpegPdfPages(pages){
   const enc=s=>new TextEncoder().encode(s), parts=[], offs=[]; let len=0;
   const push=b=>{ parts.push(b); len+=b.length; };
   const obj=(n,body)=>{ offs[n]=len; push(enc(`${n} 0 obj\n`)); body.forEach(push); push(enc("\nendobj\n")); };
-  const cs=`q 595.28 0 0 841.89 0 0 cm /Im0 Do Q`;
+  const n=pages.length, kids=pages.map((_,i)=>`${3+i*3} 0 R`).join(" ");
   push(enc("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n"));
   obj(1,[enc("<< /Type /Catalog /Pages 2 0 R >>")]);
-  obj(2,[enc("<< /Type /Pages /Kids [3 0 R] /Count 1 >>")]);
-  obj(3,[enc("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>")]);
-  obj(4,[enc(`<< /Type /XObject /Subtype /Image /Width ${pw} /Height ${ph} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`),jpg,enc("\nendstream")]);
-  obj(5,[enc(`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`)]);
-  const x=len; let t="xref\n0 6\n0000000000 65535 f \n"; for(let n=1;n<=5;n++) t+=String(offs[n]).padStart(10,"0")+" 00000 n \n";
-  push(enc(t+`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${x}\n%%EOF`));
+  obj(2,[enc(`<< /Type /Pages /Kids [${kids}] /Count ${n} >>`)]);
+  pages.forEach((p,i)=>{
+    const bin=atob(p.dataURL.split(",")[1]), jpg=new Uint8Array(bin.length); for(let j=0;j<bin.length;j++) jpg[j]=bin.charCodeAt(j);
+    const po=3+i*3, io=po+1, co=po+2, cs=`q 595.28 0 0 841.89 0 0 cm /Im${i} Do Q`;
+    obj(po,[enc(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im${i} ${io} 0 R >> >> /Contents ${co} 0 R >>`)]);
+    obj(io,[enc(`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`),jpg,enc("\nendstream")]);
+    obj(co,[enc(`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`)]);
+  });
+  const total=3+n*3, x=len; let t=`xref\n0 ${total}\n0000000000 65535 f \n`; for(let k=1;k<total;k++) t+=String(offs[k]).padStart(10,"0")+" 00000 n \n";
+  push(enc(t+`trailer\n<< /Size ${total} /Root 1 0 R >>\nstartxref\n${x}\n%%EOF`));
   return new Blob(parts,{type:"application/pdf"});
 }
+function jpegPdf(dataURL,pw,ph){ return jpegPdfPages([{dataURL,w:pw,h:ph}]); }
 $("pdfBtn").addEventListener("click", async ()=>{
   await render(); save(baseName()+".pdf", jpegPdf(canvas.toDataURL("image/jpeg",0.93),W,H));
 });
-$("printBtn").addEventListener("click", async ()=>{
-  await render(); const im=$("printImg");
-  await new Promise(r=>{ im.onload=r; im.src=canvas.toDataURL("image/jpeg",0.95); });
+async function printPages(urls){
+  const area=$("printArea"); area.replaceChildren();
+  await Promise.all(urls.map(u=>new Promise(r=>{ const im=new Image(); im.onload=im.onerror=r; im.src=u; area.append(im); })));
   window.print();
-});
+}
+$("printBtn").addEventListener("click", async ()=>{ await render(); await printPages([canvas.toDataURL("image/jpeg",0.95)]); });
 if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 loadFont().then(render);
 document.fonts?.ready?.then(()=>render());
+
+/* ======================================================================
+   النسخة الثانية: دروسي السابقة، بياناتي، توقيعي، تحضير الأسبوع، بنك الأنشطة
+   كل البيانات تُحفظ على جهاز المعلم فقط (IndexedDB، ومعها localStorage احتياطًا)
+   ====================================================================== */
+
+/* ---------- small helpers ---------- */
+const lsGet=(k,d)=>{ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } };
+const lsSet=(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } };
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const el=(tag,props={},...kids)=>{ const e=document.createElement(tag); for(const [k,v] of Object.entries(props)){ if(k==="class") e.className=v; else if(k==="text") e.textContent=v; else if(k.startsWith("on")) e.addEventListener(k.slice(2),v); else if(v!==false&&v!=null) e.setAttribute(k,v===true?"":v); } for(const c of kids) if(c!=null) e.append(c); return e; };
+const fmtDate=d=>`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+const DAY_NAMES=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"];
+let toastTimer=null;
+function toast(msg,isErr){ const t=$("toast"); t.textContent=msg; t.classList.toggle("err",!!isErr); t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{t.hidden=true},isErr?5000:3200); }
+/* a destructive or lossy action needs a second tap on the same button */
+function confirmTap(btn,label,fn){
+  if(btn.dataset.armed==="1"){ btn.dataset.armed=""; btn.textContent=btn.dataset.label; btn.classList.remove("danger"); fn(); return; }
+  btn.dataset.label=btn.textContent; btn.dataset.armed="1"; btn.textContent=label; btn.classList.add("danger");
+  setTimeout(()=>{ if(btn.dataset.armed==="1"){ btn.dataset.armed=""; btn.textContent=btn.dataset.label; btn.classList.remove("danger"); } },4500);
+}
+const tplName=id=>TEMPLATES[id]?.name||"";
+const thumbOf=id=>THUMBS[id]||THUMBS.green;
+
+/* ---------- storage: IndexedDB, falling back to localStorage ---------- */
+const Store=(()=>{
+  let dbp=null;
+  const open=()=>dbp||(dbp=new Promise(res=>{
+    try{ const r=indexedDB.open("eva-lesson",1);
+      r.onupgradeneeded=()=>{ const d=r.result; for(const s of ["lessons","weeks"]) if(!d.objectStoreNames.contains(s)) d.createObjectStore(s,{keyPath:"id"}); };
+      r.onsuccess=()=>res(r.result); r.onerror=()=>res(null); r.onblocked=()=>res(null);
+    }catch(e){ res(null); } }));
+  const fk=s=>"lp-store-"+s;
+  const tx=(d,s,mode,fn)=>new Promise((res,rej)=>{ const t=d.transaction(s,mode), st=t.objectStore(s), q=fn(st); t.oncomplete=()=>res(q&&q.result); t.onerror=()=>rej(t.error); t.onabort=()=>rej(t.error); });
+  return {
+    async all(s){ const d=await open(); return d? (await tx(d,s,"readonly",st=>st.getAll()))||[] : lsGet(fk(s),[]); },
+    async get(s,id){ const d=await open(); return d? tx(d,s,"readonly",st=>st.get(id)) : lsGet(fk(s),[]).find(x=>x.id===id); },
+    async put(s,o){ const d=await open(); if(d) return tx(d,s,"readwrite",st=>{st.put(o)});
+      const a=lsGet(fk(s),[]).filter(x=>x.id!==o.id); a.push(o); if(!lsSet(fk(s),a)) throw new Error("quota"); },
+    async del(s,id){ const d=await open(); if(d) return tx(d,s,"readwrite",st=>{st.delete(id)}); lsSet(fk(s),lsGet(fk(s),[]).filter(x=>x.id!==id)); },
+  };
+})();
+try{ navigator.storage?.persist?.(); }catch(e){}
+
+/* ---------- navigation between sections (the editor stays in the page, so nothing typed is lost) ---------- */
+const VIEWS=["editor","archive","week","bank","settings"];
+function showView(v,{push=true}={}){
+  if(!VIEWS.includes(v)) v="editor";
+  for(const x of VIEWS) $("view-"+x).hidden=x!==v;
+  for(const b of $("tabs").children) b.toggleAttribute("aria-current",b.dataset.view===v), b.dataset.view===v&&b.setAttribute("aria-current","page");
+  if(push) try{ history.replaceState(null,"",v==="editor"?location.pathname+location.search:"#"+v); }catch(e){}
+  if(v==="archive") refreshArchive();
+  if(v==="week") refreshWeek();
+  if(v==="settings") sizePad();
+  if(v==="bank") renderBank();
+  window.scrollTo({top:0});
+}
+for(const b of $("tabs").children) b.addEventListener("click",()=>showView(b.dataset.view));
+
+/* ---------- current lesson state & draft autosave ---------- */
+let currentId=null, pendingSlot=null, dirty=false, exporting=false, draftTimer=null;
+function lessonFromEditor(){ return {data:getData(), prep:$("prep").value, tpl:TPL_ID}; }
+function saveDraft(){ if(exporting) return; clearTimeout(draftTimer); draftTimer=setTimeout(()=>lsSet("lp-draft",{...lessonFromEditor(),currentId,pendingSlot,dirty}),400); }
+function markDirty(){ if(exporting) return; dirty=true; updateBar(); saveDraft(); }
+$("view-editor").addEventListener("input",e=>{ if(e.target.id!=="ruled"&&!e.target.closest("#stylePanel")) markDirty(); });
+function updateBar(){
+  const d=getData(), t=d.title||"درس بلا عنوان";
+  $("lbTitle").textContent=currentId?t:(d.title?t:"درس جديد");
+  const bits=[d.subject,d.grade&&("الصف "+d.grade),d.date].filter(Boolean);
+  let state=currentId?(dirty?"تغييرات غير محفوظة":"محفوظ في دروسي"):"غير محفوظ بعد";
+  if(pendingSlot) state+=` · سيُضاف إلى ${DAY_NAMES[pendingSlot.day]} في تحضير الأسبوع`;
+  $("lbSub").textContent=[...bits,state].join(" · ");
+  $("saveLessonBtn").textContent=currentId?"حفظ التعديلات":"حفظ في دروسي";
+  $("saveCopyBtn").hidden=!currentId;
+}
+/* template switches are part of the lesson; switching to the template already shown just redraws */
+const _switchTemplate=switchTemplate;
+switchTemplate=async function(id){ if(id===TPL_ID&&TEMPLATES[id]){ await render(); return; } await _switchTemplate(id); if(!exporting){ markDirtyIfLoaded(); } };
+let loaded=false; const markDirtyIfLoaded=()=>{ if(loaded) markDirty(); };
+
+/* ---------- teacher profile ---------- */
+const PF=["teacher","school","grade","section","subject","period","subjects"];
+const getProfile=()=>lsGet("lp-profile",{});
+function applyDefaults(d){ const p=getProfile(); for(const k of ["teacher","grade","section","subject","period"]) if(!d[k]&&p[k]) d[k]=p[k]; return d; }
+function fillProfileForm(){ const p=getProfile(); for(const k of PF) $("pf_"+k).value=p[k]||""; }
+function subjectList(){ const p=getProfile(); return [...new Set([p.subject,...(p.subjects||"").split(/[،,]/)].map(s=>(s||"").trim()).filter(Boolean))]; }
+function refreshSubjectList(){ let dl=$("subjList"); if(!dl){ dl=el("datalist",{id:"subjList"}); document.body.append(dl); $("f_subject").setAttribute("list","subjList"); } dl.replaceChildren(...subjectList().map(s=>el("option",{value:s}))); }
+$("pfSaveBtn").addEventListener("click",()=>{ const p={}; for(const k of PF) p[k]=$("pf_"+k).value.trim(); if(lsSet("lp-profile",p)){ refreshSubjectList(); toast("حُفظت بياناتك. ستُكتب تلقائيًا في كل درس جديد."); } else toast("تعذّر الحفظ: مساحة التخزين ممتلئة.",true); });
+$("pfApplyBtn").addEventListener("click",()=>{ const p={}; for(const k of PF) p[k]=$("pf_"+k).value.trim();
+  const map={teacher:"teacher",grade:"grade",section:"section",subject:"subject",period:"period"}; let n=0;
+  for(const [pk,fk] of Object.entries(map)) if(p[pk]){ $("f_"+fk).value=p[pk]; n++; }
+  if(!n){ toast("اكتب بياناتك أولًا.",true); return; } markDirty(); render(); toast("كُتبت بياناتك في الدرس الحالي."); });
+
+/* ---------- saving lessons ---------- */
+async function saveLesson(asCopy){
+  const L=lessonFromEditor();
+  if(!Object.values(L.data).some(Boolean)){ toast("الدفتر فارغ. املأه أولًا ثم احفظه.",true); return; }
+  const now=Date.now(); let rec;
+  if(currentId&&!asCopy){ const old=await Store.get("lessons",currentId); rec={...(old||{}),...L,id:currentId,updated:now,created:old?.created||now}; }
+  else rec={...L,id:newId(),created:now,updated:now,school:getProfile().school||""};
+  try{ await Store.put("lessons",rec); }catch(e){ toast("تعذّر الحفظ: مساحة التخزين ممتلئة. نزّل نسخة احتياطية واحذف دروسًا قديمة.",true); return; }
+  let extra="";
+  if(pendingSlot&&!currentId){ const w=await Store.get("weeks",pendingSlot.weekId); if(w){ w.days[pendingSlot.day].push(rec.id); await Store.put("weeks",w); extra=` وأُضيف إلى ${DAY_NAMES[pendingSlot.day]}`; } pendingSlot=null; }
+  currentId=rec.id; dirty=false; updateBar(); saveDraft();
+  toast((asCopy?"حُفظت نسخة جديدة في دروسي":"حُفظ الدرس في دروسي")+extra+".");
+}
+$("saveLessonBtn").addEventListener("click",()=>saveLesson(false));
+$("saveCopyBtn").addEventListener("click",()=>saveLesson(true));
+async function openLesson(rec,{asNew=false}={}){
+  setData(rec.data||{}); $("prep").value=rec.prep||""; $("sampleBadge").hidden=true; $("parseReport").hidden=true;
+  if(asNew){ for(const k of ["day","date","hijri"]) $("f_"+k).value=""; currentId=null; dirty=true; } else { currentId=rec.id; dirty=false; }
+  pendingSlot=null;
+  if(TEMPLATES[rec.tpl]&&rec.tpl!==TPL_ID){ exporting=true; await _switchTemplate(rec.tpl); exporting=false; markGallery(); } else await render();
+  updateBar(); saveDraft(); showView("editor");
+}
+function startNew(slot){
+  const d={}; applyDefaults(d);
+  if(slot){ d.day=DAY_NAMES[slot.day]; const w=weekCache.find(x=>x.id===slot.weekId); if(w?.start){ const dt=new Date(w.start+"T12:00:00"); dt.setDate(dt.getDate()+slot.day); d.date=fmtDate(dt); } }
+  setData(d); $("prep").value=""; $("sampleBadge").hidden=true; $("parseReport").hidden=true; $("warnings").hidden=true;
+  currentId=null; dirty=false; pendingSlot=slot||null; render(); updateBar(); saveDraft(); showView("editor"); $("prep").focus({preventScroll:true});
+}
+$("newLessonBtn").addEventListener("click",e=>{ if(dirty) confirmTap(e.currentTarget,"تأكيد: درس جديد دون حفظ",()=>startNew()); else startNew(); });
+$("toBankBtn").addEventListener("click",()=>showView("bank"));
+
+/* ---------- دروسي السابقة ---------- */
+let lessonCache=[];
+const lessonKey=r=>{ const m=(r.data?.date||"").match(/(\d{1,4})\D(\d{1,2})\D(\d{1,4})/); if(!m) return 0; let [a,b,c]=[+m[1],+m[2],+m[3]]; const y=a>31?a:c, d=a>31?c:a; return y*10000+b*100+d; };
+async function refreshArchive(){
+  lessonCache=(await Store.all("lessons")).sort((a,b)=>b.updated-a.updated);
+  const subs=[...new Set(lessonCache.map(r=>r.data?.subject).filter(Boolean))].sort(), grs=[...new Set(lessonCache.map(r=>r.data?.grade).filter(Boolean))].sort();
+  for(const [id,list,all] of [["arSubject",subs,"كل المواد"],["arGrade",grs,"كل الصفوف"]]){ const s=$(id), v=s.value; s.replaceChildren(el("option",{value:""},all),...list.map(x=>el("option",{value:x},x))); s.value=list.includes(v)?v:""; }
+  drawArchive();
+}
+function drawArchive(){
+  const q=normAr($("arSearch").value||""), fs=$("arSubject").value, fg=$("arGrade").value, sort=$("arSort").value;
+  let rows=lessonCache.filter(r=>(!fs||r.data?.subject===fs)&&(!fg||r.data?.grade===fg)&&(!q||normAr(Object.values(r.data||{}).join(" ")+" "+(r.prep||"")).includes(q)));
+  const by={updated:(a,b)=>b.updated-a.updated, date:(a,b)=>lessonKey(b)-lessonKey(a)||b.updated-a.updated,
+    subject:(a,b)=>(a.data?.subject||"￿").localeCompare(b.data?.subject||"￿","ar")||lessonKey(b)-lessonKey(a),
+    grade:(a,b)=>(a.data?.grade||"￿").localeCompare(b.data?.grade||"￿","ar")||lessonKey(b)-lessonKey(a)}[sort];
+  rows.sort(by);
+  const list=$("arList"); list.replaceChildren();
+  $("arCount").textContent=lessonCache.length?`${rows.length} من ${lessonCache.length} درسًا`:"";
+  $("arEmpty").hidden=lessonCache.length>0; if(lessonCache.length&&!rows.length) list.append(el("p",{class:"empty",text:"لا توجد دروس تطابق البحث."}));
+  let grp=null;
+  for(const r of rows){
+    const g=sort==="subject"?(r.data?.subject||"بلا مادة"):sort==="grade"?(r.data?.grade?"الصف "+r.data.grade:"بلا صف"):null;
+    if(g!==null&&g!==grp){ grp=g; list.append(el("div",{class:"grp",text:g})); }
+    list.append(lessonCard(r));
+  }
+}
+function lessonCard(r){
+  const d=r.data||{}, up=new Date(r.updated);
+  const del=el("button",{type:"button",class:"sm danger-soft",text:"حذف"});
+  del.addEventListener("click",()=>confirmTap(del,"تأكيد الحذف",async()=>{ await Store.del("lessons",r.id); if(currentId===r.id){ currentId=null; updateBar(); saveDraft(); } toast("حُذف الدرس."); refreshArchive(); }));
+  const openBtn=el("button",{type:"button",class:"sm primary",text:"فتح وتعديل"});
+  openBtn.addEventListener("click",()=>{ if(dirty&&currentId!==r.id) confirmTap(openBtn,"تأكيد: فتح دون حفظ الحالي",()=>openLesson(r)); else openLesson(r); });
+  return el("article",{class:"card"},
+    el("img",{src:thumbOf(r.tpl),alt:"",loading:"lazy",width:"58",height:"82"}),
+    el("div",{class:"cb"},
+      el("h3",{text:d.title||"درس بلا عنوان"}),
+      el("div",{class:"meta"},...[d.subject,d.grade&&"الصف "+d.grade,d.section&&"الشعبة "+d.section,d.date,tplName(r.tpl)].filter(Boolean).map(t=>el("span",{text:t})),el("span",{text:"عُدّل "+fmtDate(up)})),
+      el("div",{class:"row"},openBtn,
+        el("button",{type:"button",class:"sm",text:"نسخة مكررة",onclick:async()=>{ const now=Date.now(); await Store.put("lessons",{...structuredClone(r),id:newId(),created:now,updated:now}); toast("أُنشئت نسخة من الدرس."); refreshArchive(); }}),
+        el("button",{type:"button",class:"sm",text:"ابدأ منه درسًا جديدًا",onclick:()=>{ openLesson(r,{asNew:true}); toast("فُتح الدرس كبداية لدرس جديد. عدّل التاريخ ثم احفظه."); }}),
+        del)));
+}
+for(const id of ["arSearch","arSubject","arGrade","arSort"]) $(id).addEventListener(id==="arSearch"?"input":"change",drawArchive);
+
+/* ---------- توقيعي الشخصي ---------- */
+const SIGBOX={ green:[1370,1775,2678,2780], green3:[1370,1775,2678,2780], sci1:[1355,1755,2614,2712], sci2:[1355,1755,2614,2712], arabic:[1355,1755,2614,2712], colorful:[1355,1755,2614,2712], teal:[1140,1680,2682,2776] };
+const getSig=()=>lsGet("lp-signature",null);
+const sigImgCache=new Map();
+function sigImage(src){ if(!sigImgCache.has(src)) sigImgCache.set(src,new Promise(r=>{ const im=new Image(); im.onload=()=>r(im); im.onerror=()=>r(null); im.src=src; })); return sigImgCache.get(src); }
+async function drawSignature(){
+  const s=getSig(); if(!s?.src||s.auto===false) return;
+  const b=SIGBOX[TPL_ID]; if(!b) return;
+  const im=await sigImage(s.src); if(!im) return;
+  const [x0,x1,y0,y1]=b, bw=x1-x0, bh=y1-y0, r=im.naturalWidth/im.naturalHeight;
+  let w=bw, h=w/r; if(h>bh){ h=bh; w=h*r; }
+  ctx.drawImage(im, x0+(bw-w)/2, y1-h, w, h);
+}
+function trimCanvas(c){
+  const x=c.getContext("2d"), {width:w,height:h}=c, d=x.getImageData(0,0,w,h).data;
+  let t=h,l=w,r=-1,b=-1; for(let y=0;y<h;y++) for(let i=0;i<w;i++) if(d[(y*w+i)*4+3]>16){ if(y<t)t=y; if(y>b)b=y; if(i<l)l=i; if(i>r)r=i; }
+  if(r<0) return null; const p=6; l=Math.max(0,l-p); t=Math.max(0,t-p); r=Math.min(w-1,r+p); b=Math.min(h-1,b+p);
+  let ow=r-l+1, oh=b-t+1, sc=Math.min(1,1000/ow); const o=document.createElement("canvas"); o.width=Math.round(ow*sc); o.height=Math.round(oh*sc);
+  const ox=o.getContext("2d"); ox.imageSmoothingQuality="high"; ox.drawImage(c,l,t,ow,oh,0,0,o.width,o.height); return o.toDataURL("image/png");
+}
+function storeSig(src){ const old=getSig(); if(!lsSet("lp-signature",{src,auto:old?.auto!==false})){ toast("تعذّر حفظ التوقيع: مساحة التخزين ممتلئة.",true); return false; } showSig(); render(); return true; }
+function showSig(){
+  const s=getSig(); $("sigSaved").hidden=!s?.src; if(!s?.src) return;
+  $("sigPrev").src=s.src; $("sigAuto").checked=s.auto!==false;
+  const yes=Object.keys(SIGBOX).map(tplName).filter(Boolean), no=Object.keys(TEMPLATES).filter(id=>!SIGBOX[id]).map(tplName);
+  $("sigNote").textContent=`يظهر في القوالب: ${yes.join("، ")}.`+(no.length?` لا توجد خانة توقيع في: ${no.join("، ")}.`:"");
+}
+const pad=$("sigPad"), pctx=pad.getContext("2d"); let drawing=false, last=null, strokes=0;
+function sizePad(){ const r=pad.getBoundingClientRect(); if(!r.width) return; const dpr=Math.min(3,window.devicePixelRatio||1);
+  if(pad.width===Math.round(r.width*dpr)) return; pad.width=Math.round(r.width*dpr); pad.height=Math.round(r.height*dpr); strokes=0; $("sigPh").hidden=false; }
+window.addEventListener("resize",()=>{ if(!$("view-settings").hidden) sizePad(); });
+const ptOf=e=>{ const r=pad.getBoundingClientRect(); return [(e.clientX-r.left)*pad.width/r.width,(e.clientY-r.top)*pad.height/r.height]; };
+pad.addEventListener("pointerdown",e=>{ e.preventDefault(); pad.setPointerCapture(e.pointerId); drawing=true; last=ptOf(e); $("sigPh").hidden=true;
+  const dpr=pad.width/pad.getBoundingClientRect().width; pctx.lineWidth=3.2*dpr; pctx.lineCap="round"; pctx.lineJoin="round"; pctx.strokeStyle=$("sigInk").value; pctx.fillStyle=$("sigInk").value;
+  pctx.beginPath(); pctx.arc(last[0],last[1],pctx.lineWidth/2,0,7); pctx.fill(); strokes++; });
+pad.addEventListener("pointermove",e=>{ if(!drawing) return; e.preventDefault(); const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+  for(const ev of evs){ const p=ptOf(ev); const mid=[(last[0]+p[0])/2,(last[1]+p[1])/2]; pctx.beginPath(); pctx.moveTo(last[0],last[1]); pctx.quadraticCurveTo(last[0],last[1],mid[0],mid[1]); pctx.lineTo(p[0],p[1]); pctx.stroke(); last=p; } });
+for(const ev of ["pointerup","pointercancel","pointerleave"]) pad.addEventListener(ev,()=>{ drawing=false; });
+$("sigClearBtn").addEventListener("click",()=>{ pctx.clearRect(0,0,pad.width,pad.height); strokes=0; $("sigPh").hidden=false; });
+$("sigSaveBtn").addEventListener("click",()=>{ if(!strokes){ toast("ارسم توقيعك في اللوحة أولًا.",true); return; } const src=trimCanvas(pad); if(!src){ toast("ارسم توقيعك في اللوحة أولًا.",true); return; }
+  if(storeSig(src)){ pctx.clearRect(0,0,pad.width,pad.height); strokes=0; $("sigPh").hidden=false; toast("حُفظ توقيعك، وسيظهر في خانة توقيع المعلم."); } });
+$("sigUp").addEventListener("change",async e=>{ const f=e.target.files?.[0]; e.target.value=""; if(!f) return;
+  const url=URL.createObjectURL(f), im=await sigImage(url); URL.revokeObjectURL(url); sigImgCache.delete(url);
+  if(!im){ toast("تعذّر فتح الصورة.",true); return; }
+  const sc=Math.min(1,1400/Math.max(im.naturalWidth,im.naturalHeight)), c=document.createElement("canvas"); c.width=Math.round(im.naturalWidth*sc); c.height=Math.round(im.naturalHeight*sc);
+  const x=c.getContext("2d"); x.drawImage(im,0,0,c.width,c.height); const id=x.getImageData(0,0,c.width,c.height), d=id.data;
+  for(let i=0;i<d.length;i+=4){ const L=.3*d[i]+.59*d[i+1]+.11*d[i+2]; const a=L>=195?0:L<=120?255:Math.round((195-L)/75*255); d[i+3]=Math.min(d[i+3],a); }
+  x.putImageData(id,0,0); const src=trimCanvas(c);
+  if(!src){ toast("لم أجد توقيعًا واضحًا في الصورة. صوّر التوقيع على ورقة بيضاء بإضاءة جيدة.",true); return; }
+  if(storeSig(src)) toast("حُفظ توقيعك من الصورة بعد إزالة خلفيتها البيضاء."); });
+$("sigAuto").addEventListener("change",()=>{ const s=getSig(); if(!s) return; s.auto=$("sigAuto").checked; lsSet("lp-signature",s); render(); toast(s.auto?"سيُدرج التوقيع تلقائيًا.":"أُوقف إدراج التوقيع."); });
+$("sigDelBtn").addEventListener("click",e=>confirmTap(e.currentTarget,"تأكيد حذف التوقيع",()=>{ try{ localStorage.removeItem("lp-signature"); }catch(_){} showSig(); render(); toast("حُذف التوقيع."); }));
+
+/* ---------- تحضير الأسبوع ---------- */
+let weekCache=[], weekId=lsGet("lp-week-current",null);
+const sundayOf=d=>{ const x=new Date(d); x.setDate(x.getDate()-x.getDay()); return x; };
+const isoDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+async function newWeek(){ const n=weekCache.length+1, w={id:newId(),label:`الأسبوع ${n}`,start:isoDate(sundayOf(new Date())),days:DAY_NAMES.map(()=>[]),created:Date.now()}; await Store.put("weeks",w); weekId=w.id; lsSet("lp-week-current",weekId); return w; }
+const curWeek=()=>weekCache.find(w=>w.id===weekId);
+async function refreshWeek(){
+  weekCache=(await Store.all("weeks")).sort((a,b)=>(b.start||"").localeCompare(a.start||"")||b.created-a.created);
+  if(!weekCache.length){ await newWeek(); weekCache=await Store.all("weeks"); }
+  if(!curWeek()) weekId=weekCache[0].id;
+  lessonCache=await Store.all("lessons");
+  const w=curWeek();
+  $("wkSel").replaceChildren(...weekCache.map(x=>el("option",{value:x.id},x.label||x.start)));
+  $("wkSel").value=w.id; $("wkStart").value=w.start||""; $("wkLabel").value=w.label||"";
+  drawWeek();
+}
+function weekLessons(w){ return w.days.map(ids=>ids.map(id=>lessonCache.find(l=>l.id===id)).filter(Boolean)); }
+function drawWeek(){
+  const w=curWeek(), box=$("wkDays"); box.replaceChildren(); if(!w) return;
+  const per=weekLessons(w), start=w.start?new Date(w.start+"T12:00:00"):null;
+  per.forEach((ls,di)=>{
+    const date=start?(()=>{ const d=new Date(start); d.setDate(d.getDate()+di); return fmtDate(d); })():"";
+    const day=el("section",{class:"day"},el("div",{class:"day-h"},el("strong",{text:DAY_NAMES[di]}),el("span",{class:"hint",text:[date,ls.length?`${ls.length} درس`:"لا دروس بعد"].filter(Boolean).join(" · ")})));
+    for(const l of ls){
+      const sel=el("select",{"aria-label":"قالب الدرس"},...Object.keys(TEMPLATES).filter(id=>TEMPLATES[id]).map(id=>el("option",{value:id},tplName(id))));
+      sel.value=l.tpl; sel.addEventListener("change",async()=>{ l.tpl=sel.value; l.updated=Date.now(); await Store.put("lessons",l); toast("تغيّر قالب الدرس."); });
+      const rm=el("button",{type:"button",class:"sm",text:"إزالة"}), del=el("button",{type:"button",class:"sm danger-soft",text:"حذف"});
+      rm.addEventListener("click",async()=>{ w.days[di]=w.days[di].filter(x=>x!==l.id); await Store.put("weeks",w); drawWeek(); toast("أُزيل الدرس من الأسبوع، وبقي في دروسي."); });
+      del.addEventListener("click",()=>confirmTap(del,"تأكيد الحذف",async()=>{ w.days[di]=w.days[di].filter(x=>x!==l.id); await Store.put("weeks",w); await Store.del("lessons",l.id); lessonCache=lessonCache.filter(x=>x.id!==l.id); drawWeek(); toast("حُذف الدرس."); }));
+      day.append(el("div",{class:"wl"},el("div",{class:"wt"},el("span",{text:l.data?.title||"درس بلا عنوان"}),el("small",{text:[l.data?.subject,l.data?.grade&&"الصف "+l.data.grade].filter(Boolean).join(" · ")})),
+        sel,el("button",{type:"button",class:"sm",text:"تعديل",onclick:()=>openLesson(l)}),rm,del));
+    }
+    const pick=el("select",{"aria-label":"أضف درسًا محفوظًا"},el("option",{value:""},"أضف درسًا من دروسي…"),...[...lessonCache].sort((a,b)=>b.updated-a.updated).map(l=>el("option",{value:l.id},[l.data?.title||"بلا عنوان",l.data?.subject,l.data?.grade].filter(Boolean).join(" – "))));
+    pick.addEventListener("change",async()=>{ const src=lessonCache.find(l=>l.id===pick.value); if(!src) return;
+      const now=Date.now(), copy={...structuredClone(src),id:newId(),created:now,updated:now}; copy.data.day=DAY_NAMES[di]; if(date) copy.data.date=date; copy.data.hijri="";
+      await Store.put("lessons",copy); w.days[di].push(copy.id); await Store.put("weeks",w); lessonCache.push(copy); drawWeek(); toast(`أُضيفت نسخة من الدرس إلى ${DAY_NAMES[di]} بتاريخ اليوم.`); });
+    day.append(el("div",{class:"add"},el("button",{type:"button",class:"sm primary",text:"درس جديد لهذا اليوم",onclick:()=>startNew({weekId:w.id,day:di})}),pick));
+    box.append(day);
+  });
+  const n=per.flat().length; $("wkPdfBtn").textContent=n?`تنزيل الأسبوع PDF (${n} صفحة)`:"تنزيل الأسبوع PDF"; $("wkPdfBtn").disabled=!n; $("wkPrintBtn").disabled=!n;
+}
+$("wkSel").addEventListener("change",()=>{ weekId=$("wkSel").value; lsSet("lp-week-current",weekId); refreshWeek(); });
+$("wkNewBtn").addEventListener("click",async()=>{ await newWeek(); await refreshWeek(); toast("أُنشئ أسبوع جديد."); });
+$("wkDelBtn").addEventListener("click",e=>confirmTap(e.currentTarget,"تأكيد حذف الأسبوع",async()=>{ await Store.del("weeks",weekId); weekId=null; await refreshWeek(); toast("حُذف الأسبوع. دروسه باقية في «دروسي»."); }));
+$("wkStart").addEventListener("change",async()=>{ const w=curWeek(); if(!w) return; w.start=$("wkStart").value;
+  const start=w.start?new Date(w.start+"T12:00:00"):null;
+  if(start){ for(let di=0;di<w.days.length;di++) for(const id of w.days[di]){ const l=lessonCache.find(x=>x.id===id); if(!l) continue; const d=new Date(start); d.setDate(d.getDate()+di); l.data.date=fmtDate(d); l.data.day=DAY_NAMES[di]; l.updated=Date.now(); await Store.put("lessons",l); } }
+  await Store.put("weeks",w); drawWeek(); toast("حُدّثت تواريخ دروس الأسبوع."); });
+$("wkLabel").addEventListener("change",async()=>{ const w=curWeek(); if(!w) return; w.label=$("wkLabel").value.trim()||w.label; await Store.put("weeks",w); refreshWeek(); });
+/* render each lesson on its own template, then put the editor back exactly as it was */
+async function renderWeekPages(q){
+  const w=curWeek(); if(!w) return {pages:[],warns:[]};
+  const lessons=weekLessons(w).flat(), keep={data:getData(),tpl:TPL_ID}, pages=[], warns=[];
+  exporting=true;
+  try{
+    for(let i=0;i<lessons.length;i++){ const l=lessons[i];
+      $("wkStatus").textContent=`جارٍ تجهيز الصفحة ${i+1} من ${lessons.length}…`;
+      setData(l.data||{}); if(TEMPLATES[l.tpl]&&l.tpl!==TPL_ID) await _switchTemplate(l.tpl); else await render();
+      if(!$("warnings").hidden) warns.push(l.data?.title||`الصفحة ${i+1}`);
+      pages.push({dataURL:canvas.toDataURL("image/jpeg",q),w:W,h:H});
+    }
+  } finally {
+    setData(keep.data); if(keep.tpl!==TPL_ID) await _switchTemplate(keep.tpl); else await render(); markGallery(); exporting=false;
+  }
+  return {pages,warns};
+}
+$("wkPdfBtn").addEventListener("click",async()=>{ const b=$("wkPdfBtn"); b.disabled=true;
+  try{ const {pages,warns}=await renderWeekPages(0.9); if(!pages.length) return;
+    const name=("تحضير "+(curWeek()?.label||"الأسبوع")).replace(/[\\/:*?"<>|]+/g,"").slice(0,70)+".pdf";
+    save(name,jpegPdfPages(pages),`نُزّل تحضير الأسبوع: ${pages.length} صفحة.`);
+    $("wkStatus").textContent=warns.length?`تنبيه: نص أطول من مساحته في: ${warns.join("، ")}. افتح الدرس واختصره.`:"";
+  }catch(e){ toast("تعذّر تجهيز الملف. جرّب عددًا أقل من الدروس.",true); $("wkStatus").textContent=""; }
+  finally{ b.disabled=false; } });
+$("wkPrintBtn").addEventListener("click",async()=>{ const {pages}=await renderWeekPages(0.92); $("wkStatus").textContent=""; if(pages.length) await printPages(pages.map(p=>p.dataURL)); });
+
+/* ---------- بنك الأنشطة التربوية ---------- */
+const BANK=[
+ {id:"strat",name:"استراتيجيات التدريس",target:"methods",items:["التعلم التعاوني","العصف الذهني","التعلم باللعب","الحوار والمناقشة","لعب الأدوار","التعلم بالاكتشاف","حل المشكلات","فكّر – زاوج – شارك","الخرائط الذهنية","القصة التعليمية","تعلّم الأقران","الرؤوس المرقمة","جدول التعلم (أعرف – أريد أن أعرف – تعلمت)","المحطات التعليمية","الصف المقلوب","التعلم القائم على المشروع","القبعات الست","الكرسي الساخن","أعواد المثلجات","التعليم المتمايز"]},
+ {id:"meth",name:"طرائق التدريس",target:"methods",items:["الشرح والإلقاء","الحوار والمناقشة","العرض العملي","الاستقراء","القياس","التجريب العملي","الأسئلة والأجوبة","التعلم الذاتي","المحاكاة","التمثيل","العمل في مجموعات","الطريقة الكلية الجزئية"]},
+ {id:"res",name:"مصادر التعلم",target:"resources",items:["الكتاب المدرسي","السبورة","السبورة التفاعلية","بطاقات تعليمية","بطاقات الحروف والكلمات","صور ولوحات","عرض تقديمي","مقطع فيديو تعليمي","أوراق عمل","لوحة الجيوب","نماذج ومجسمات","أدوات المختبر","خرائط","حاسوب وجهاز عرض","مصادر من البيئة المحلية","تسجيل صوتي"]},
+ {id:"tools",name:"الأدوات والوسائل",target:"resources",items:["أقلام ملونة","بطاقات ملونة","سبورة صغيرة لكل طالب","مكعبات وعدّادات","مؤقّت أو ساعة رملية","ورق مقوى ولاصق","صندوق الأسئلة","عجلة الأسماء","أعواد المثلجات","كرة التعلم","مجسم الساعة","المسطرة والمنقلة","العدسة المكبرة","الصلصال"]},
+ {id:"warm",name:"أنشطة التهيئة",target:"warmup",items:["عرض صورة مرتبطة بالدرس وطرح سؤال حولها","سرد قصة قصيرة تمهّد لموضوع الدرس","طرح سؤال مثير للتفكير من حياة الطلاب","مراجعة سريعة للدرس السابق بأسئلة شفهية","لغز أو أحجية مرتبطة بالدرس","عرض مقطع فيديو قصير مدته دقيقة","«صندوق المفاجآت»: يُخرج الطلاب منه أشياء مرتبطة بالدرس","نشاط «ماذا أعرف؟ ماذا أريد أن أعرف؟»","تجربة بسيطة أمام الطلاب تثير التساؤل","أنشودة قصيرة مرتبطة بالدرس","ربط الدرس بموقف حياتي أو مناسبة قريبة","عرض شيء حقيقي أو مجسم ومناقشته"]},
+ {id:"assess",name:"أساليب التقويم",target:"formative",items:["أسئلة شفهية سريعة","ورقة عمل قصيرة","بطاقة الخروج","السبورات الصغيرة: يكتب كل طالب إجابته ويرفعها","إشارة الإبهام: موافق، غير موافق، غير متأكد","اختيار من متعدد","صح أو خطأ مع تصحيح الخطأ","ملاحظة أداء الطلاب بقائمة رصد","سلّم تقدير لأداء المجموعات","تقويم ذاتي: ماذا تعلمت اليوم؟","تقويم الأقران","صِل بين العمود الأول والعمود الثاني","أكمل الفراغ","إشارات المرور: أحمر، أصفر، أخضر لمستوى الفهم"]},
+ {id:"close",name:"إغلاق الدرس",target:"closure",items:["تلخيص الدرس بجملة واحدة من كل طالب","بطاقة الخروج: شيء تعلمته وسؤال ما زال لدي","خريطة ذهنية جماعية لأفكار الدرس","لعبة «من أنا؟» لمراجعة المفاهيم","قاعدة 3-2-1: ثلاث معلومات، معلومتان مهمتان، سؤال واحد","ربط ما تعلمناه بالحياة اليومية","سؤال يمهّد للدرس القادم","أكمل الجملة: «تعلمت اليوم أن…»","كرة الأسئلة: يجيب من تصل إليه الكرة","تقييم الحصة بالوجوه التعبيرية"]},
+ {id:"gifted",name:"أنشطة للمتميزين",target:"gifted",items:["إعداد سؤال تحدٍّ لزملائه حول الدرس","تأليف قصة قصيرة أو فقرة تتضمن مفاهيم الدرس","البحث عن معلومة إضافية وعرضها على الصف","تصميم خريطة ذهنية للدرس","حل تمرين تحدٍّ بمستوى أعلى","قيادة مجموعة ومساعدة زملائه (المعلم الصغير)","تصميم لعبة تعليمية بسيطة عن الدرس","إعداد ملصق توضيحي أو تقرير قصير","اقتراح حلول مبتكرة لمشكلة مرتبطة بالدرس","المقارنة بين مفهومين في جدول"]},
+ {id:"remed",name:"أنشطة علاجية",target:"intro",items:["إعادة شرح الفكرة الرئيسة بأمثلة محسوسة","بطاقات مصوّرة لتثبيت المفاهيم الأساسية","تمارين متدرّجة من السهل إلى الصعب","العمل مع زميل متميز (تعلّم الأقران)","ورقة عمل مبسّطة بنشاط واحد واضح","استخدام المجسمات والوسائل الحسية","لعبة تعليمية قصيرة لتثبيت المهارة","قراءة جهرية متكررة مع المعلم","تقسيم المهمة إلى خطوات صغيرة مع تعزيز فوري","نشاط تلوين أو قص ولصق مرتبط بالمفهوم"]},
+];
+const COMMA_FIELDS=new Set(["methods","resources"]);
+const BANK_TARGETS=["methods","resources","warmup","outcomes","path","formative","final","closure","homework","intro","gifted"];
+let bankCat=BANK[0].id; const bankPicked={};
+const getCustom=()=>lsGet("lp-bank-custom",{});
+function bankSep(){ return COMMA_FIELDS.has($("bkTarget").value)?"، ":"\n"; }
+function bankText(){ $("bkText").value=(bankPicked[bankCat]||[]).join(bankSep()); $("bkSel").textContent=(bankPicked[bankCat]||[]).length?`(${bankPicked[bankCat].length} مختار)`:""; }
+function renderBank(){
+  if(!$("bkTarget").options.length) $("bkTarget").append(...BANK_TARGETS.map(k=>el("option",{value:k},FIELD_NAMES[k])));
+  $("bkCats").replaceChildren(...BANK.map(c=>el("button",{type:"button",class:"chip",role:"tab","aria-selected":String(c.id===bankCat),text:c.name,onclick:()=>{ bankCat=c.id; $("bkTarget").value=c.target; renderBank(); }})));
+  const cat=BANK.find(c=>c.id===bankCat), picked=bankPicked[bankCat]||(bankPicked[bankCat]=[]), custom=getCustom()[bankCat]||[];
+  if(!$("bkTarget").dataset.touched) $("bkTarget").value=cat.target;
+  const chip=(t,mine)=>{ const b=el("button",{type:"button",class:"chip bk-item"+(mine?" mine":""),"aria-pressed":String(picked.includes(t)),text:t});
+    b.addEventListener("click",()=>{ const i=picked.indexOf(t); if(i>=0) picked.splice(i,1); else picked.push(t); b.setAttribute("aria-pressed",String(i<0)); bankText(); });
+    if(!mine) return b;
+    const x=el("button",{type:"button",class:"chip bk-item",title:"حذف هذا العنصر","aria-label":"حذف "+t,text:"✕"});
+    x.addEventListener("click",()=>{ const c=getCustom(); c[bankCat]=(c[bankCat]||[]).filter(s=>s!==t); lsSet("lp-bank-custom",c); const i=picked.indexOf(t); if(i>=0) picked.splice(i,1); renderBank(); });
+    return el("span",{style:"display:inline-flex;gap:2px"},b,x); };
+  $("bkItems").replaceChildren(...cat.items.map(t=>chip(t,false)),...custom.map(t=>chip(t,true)));
+  bankText();
+}
+$("bkTarget").addEventListener("change",()=>{ $("bkTarget").dataset.touched=""; bankText(); });
+$("bkAddBtn").addEventListener("click",()=>{ const t=$("bkNew").value.trim(); if(!t) return; const c=getCustom(); c[bankCat]=[...new Set([...(c[bankCat]||[]),t])]; lsSet("lp-bank-custom",c); $("bkNew").value=""; (bankPicked[bankCat]||(bankPicked[bankCat]=[])).push(t); renderBank(); toast("أُضيف العنصر إلى البنك على جهازك."); });
+$("bkNew").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); $("bkAddBtn").click(); } });
+$("bkClearBtn").addEventListener("click",()=>{ bankPicked[bankCat]=[]; renderBank(); });
+$("bkInsertBtn").addEventListener("click",async()=>{
+  const k=$("bkTarget").value, sep=COMMA_FIELDS.has(k)?"، ":"\n";
+  let t=$("bkText").value.trim(); if(!t){ toast("اختر عنصرًا أو اكتب نصًا أولًا.",true); return; }
+  if(sep==="، ") t=t.split(/\s*\n+\s*/).filter(Boolean).join("، ");
+  const f=$("f_"+k), cur=f.value.trim();
+  f.value=$("bkMode").value==="replace"||!cur?t:cur+sep+t;
+  bankPicked[bankCat]=[]; $("bkText").value=""; markDirty(); showView("editor"); await render(); $("review").open=true;
+  toast(`أُدرج في «${FIELD_NAMES[k]}».`);
+});
+
+/* ---------- template preview dialog ---------- */
+let dlgIdx=0; const galleryIds=()=>[...$("tplGallery").children].map(b=>b.dataset.id);
+function showDlg(){ const ids=galleryIds(), id=ids[(dlgIdx+ids.length)%ids.length]; $("tplDlgName").textContent=`${tplName(id)} (${(dlgIdx%ids.length+ids.length)%ids.length+1} من ${ids.length})`;
+  $("tplDlgImg").src=TEMPLATES[id].src; $("tplDlgImg").alt="قالب "+tplName(id); $("tplDlg").dataset.id=id; }
+$("tplPreviewBtn").addEventListener("click",()=>{ dlgIdx=Math.max(0,galleryIds().indexOf(TPL_ID)); showDlg(); $("tplDlg").showModal?.(); });
+$("tplDlgNext").addEventListener("click",()=>{ dlgIdx++; showDlg(); });
+$("tplDlgPrev").addEventListener("click",()=>{ dlgIdx--; showDlg(); });
+$("tplDlgClose").addEventListener("click",()=>$("tplDlg").close());
+$("tplDlg").addEventListener("click",e=>{ if(e.target===$("tplDlg")) $("tplDlg").close(); });
+$("tplDlgPick").addEventListener("click",async()=>{ const id=$("tplDlg").dataset.id; $("tplDlg").close(); await switchTemplate(id); markGallery(); toast("اختير "+tplName(id)+"."); });
+for(const im of $("tplGallery").querySelectorAll("img")){ im.loading="lazy"; im.decoding="async"; }
+for(const b of $("tplGallery").children) if(!SIGBOX[b.dataset.id]) b.title="لا توجد خانة توقيع في هذا القالب";
+
+/* ---------- appearance ---------- */
+function applyTheme(t){ if(t==="light"||t==="dark") document.documentElement.setAttribute("data-theme",t); else document.documentElement.removeAttribute("data-theme"); }
+$("themeSel").value=lsGet("lp-theme","system"); applyTheme($("themeSel").value);
+$("themeSel").addEventListener("change",()=>{ lsSet("lp-theme",$("themeSel").value); applyTheme($("themeSel").value); });
+
+/* ---------- backup ---------- */
+$("bkpExportBtn").addEventListener("click",async()=>{
+  const out={app:"eva-lesson-plan",version:2,exported:new Date().toISOString(),lessons:await Store.all("lessons"),weeks:await Store.all("weeks"),
+    profile:getProfile(),signature:getSig(),bankCustom:getCustom(),design:lsGet("lp-design-v1",null),template:TPL_ID,theme:lsGet("lp-theme","system")};
+  save(`نسخة احتياطية - دفتر التحضير - ${isoDate(new Date())}.json`,new Blob([JSON.stringify(out)],{type:"application/json"}),`نُزّلت النسخة الاحتياطية: ${out.lessons.length} درسًا.`);
+});
+$("bkpImport").addEventListener("change",async e=>{ const f=e.target.files?.[0]; e.target.value=""; if(!f) return;
+  let b; try{ b=JSON.parse(await f.text()); }catch(_){ toast("الملف ليس نسخة احتياطية صالحة.",true); return; }
+  if(b?.app!=="eva-lesson-plan"){ toast("هذا الملف ليس نسخة احتياطية من دفتر التحضير.",true); return; }
+  let n=0; try{
+    for(const l of b.lessons||[]) if(l?.id&&l.data){ await Store.put("lessons",l); n++; }
+    for(const w of b.weeks||[]) if(w?.id&&Array.isArray(w.days)) await Store.put("weeks",w);
+  }catch(_){ toast("امتلأت مساحة التخزين أثناء الاسترجاع.",true); }
+  if(b.profile) lsSet("lp-profile",b.profile); if(b.signature?.src) lsSet("lp-signature",b.signature);
+  if(b.bankCustom) lsSet("lp-bank-custom",b.bankCustom); if(b.theme){ lsSet("lp-theme",b.theme); $("themeSel").value=b.theme; applyTheme(b.theme); }
+  fillProfileForm(); refreshSubjectList(); showSig(); render(); showStorage();
+  toast(`استُرجعت النسخة: ${n} درسًا، و${(b.weeks||[]).length} أسبوعًا.`);
+});
+async function showStorage(){ try{ const n=(await Store.all("lessons")).length, e=await navigator.storage?.estimate?.(), p=await navigator.storage?.persisted?.();
+  $("storageInfo").textContent=`المحفوظ على هذا الجهاز: ${n} درسًا`+(e?.usage?` (نحو ${Math.max(1,Math.round(e.usage/1048576))} م.ب)`:"")+(p?". التخزين محميّ من المسح التلقائي.":"."); }catch(_){} }
+
+/* ---------- start-up: restore the last draft so nothing is lost after closing the app ---------- */
+(function init(){
+  fillProfileForm(); refreshSubjectList(); showSig(); showStorage();
+  const dr=lsGet("lp-draft",null);
+  if(dr?.data&&Object.values(dr.data).some(Boolean)){ setData(dr.data); $("prep").value=dr.prep||""; $("sampleBadge").hidden=true; currentId=dr.currentId||null; pendingSlot=dr.pendingSlot||null; dirty=!!dr.dirty; }
+  updateBar(); setTimeout(()=>{ loaded=true; },1500);
+  const h=location.hash.slice(1); if(VIEWS.includes(h)&&h!=="editor") showView(h,{push:false});
+})();
 </script>
 </body>
 </html>
