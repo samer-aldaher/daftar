@@ -69,6 +69,10 @@ details summary{cursor:pointer;font-weight:700;list-style-position:inside}
 .cr-flag{font-size:.75rem;font-weight:700;color:var(--warn-fg);background:var(--warn-bg);border-radius:999px;padding:1px 8px}
 .cr-review{border-color:var(--warm)}
 .cr-orig{white-space:pre-wrap;color:var(--fg)!important;background:var(--bg);border-radius:8px;padding:8px}
+.tpl-gallery{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;scroll-snap-type:x proximity}
+.tpl-card{flex:none;width:92px;display:flex;flex-direction:column;gap:4px;align-items:center;padding:4px;border:2px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);font:inherit;font-size:.78rem;font-weight:600;cursor:pointer;scroll-snap-align:start}
+.tpl-card img{width:100%;aspect-ratio:212/300;object-fit:cover;border-radius:6px;display:block}
+.tpl-card[aria-checked="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
 .log{margin:0;padding-inline-start:20px;color:var(--muted);font-size:.88rem;display:flex;flex-direction:column;gap:2px}
 .log:empty{display:none}
 .top{display:flex;gap:14px;align-items:center}
@@ -115,6 +119,7 @@ details summary{cursor:pointer;font-weight:700;list-style-position:inside}
         <button id="printBtn">طباعة</button>
       </div>
     </div>
+    <div class="tpl-gallery" id="tplGallery" role="radiogroup" aria-label="القالب"></div>
     <div class="sheet"><img id="out" alt="دفتر التحضير بعد التعبئة"></div>
   </section>
 
@@ -148,7 +153,7 @@ details summary{cursor:pointer;font-weight:700;list-style-position:inside}
 <img id="printImg" alt="">
 
 <script>
-const TEMPLATE_SRC = "template.jpg";
+const TEMPLATE_SRC = "template.jpg", TEMPLATE2_SRC = "template-purple.jpg", TEMPLATE_SCI1_SRC = "template-sci1.jpg", TEMPLATE_SCI2_SRC = "template-sci2.jpg", TEMPLATE_AR_SRC = "template-arabic.jpg", TEMPLATE_COL_SRC = "template-colorful.jpg", TEMPLATE_TEAL_SRC = "template-teal.jpg";
 const W = 2120, H = 3000;
 const INK = "#1F2A6B", RED = "#E0234E";
 const HEAD_RED = "#C62828", HEAD_BLUE = "#1565C0";
@@ -156,6 +161,8 @@ const HEAD_RED = "#C62828", HEAD_BLUE = "#1565C0";
 /* ---------- field schema (labels, input type) ---------- */
 const SCHEMA = [
   ["day","اليوم","line"],["date","التاريخ","line","مثال: 12/11/2026"],
+  ["hijri","التاريخ الهجري","line","في القوالب التي فيها خانة له، مثال: 2/6/1448"],["period","الحصة","line"],
+  ["wisdom","حكمة اليوم","line","في القوالب التي فيها خانة لها"],
   ["grade","الصف","line"],["section","الشعبة","line"],
   ["subject","المادة","line"],["title","عنوان الدرس","line"],
   ["teacher","اسم المعلم","line","يظهر في تذييل الدفتر على سطر «تصميم المعلم/ة»"],
@@ -166,12 +173,13 @@ const SCHEMA = [
   ["formative","التقويم المرحلي","area","سؤال في كل سطر"],
   ["final","التقويم النهائي","area","سؤال في كل سطر"],["final_min","مدة التقويم النهائي","line"],
   ["closure","إغلاق الدرس","area"],["closure_min","مدة إغلاق الدرس","line"],
+  ["homework","الواجب المنزلي","area","يظهر في القوالب التي فيها خانة للواجب"],
   ["intro","نشاط للأقل تحصيلاً","area"],["gifted","نشاط للطالب المتميز","area"],
 ];
 
 /* ---------- measured geometry on the 2120×3000 template ---------- */
 const L = (xl,xr,ys)=>ys.map(y=>({xl,xr,y}));
-const GEO = {
+let GEO = {
   day:{lines:[{xl:1305,xr:1852,y:324}],size:50,single:true,color:HEAD_RED},
   grade:{lines:[{xl:1305,xr:1852,y:465}],size:50,single:true,color:HEAD_RED},
   section:{lines:[{xl:1305,xr:1842,y:532}],size:50,single:true,color:HEAD_RED},
@@ -189,14 +197,14 @@ const GEO = {
   gifted:{lines:L(84,655,[2433,2487,2541,2596,2644]),size:46,marker:"auto",flow:{y0:2433,y1:2650}},
 };
 /* duration slots inside the printed "(....) د": dots box to cover, sample point for the ground colour */
-const DUR = {
+let DUR = {
   warmup_min:{box:[144,640,54,24],probe:[170,632],cx:170,base:664},
   closure_min:{box:[224,1990,58,24],probe:[252,1982],cx:252,base:2014},
   final_min:{box:[1381,1938,56,24],probe:[1408,1930],cx:1408,base:1962},
 };
-const DATE = {segs:[[1742,1852],[1640,1724],[1500,1626]], y:394};
+let DATE = {segs:[[1742,1852],[1640,1724],[1500,1626]], y:394};
 /* teacher's name goes on «تصميم المعلم/ة» in the footer band; «توقيع المعلم» stays empty for the handwritten signature */
-const DESIGN_LINE = {xl:822,xr:1432,y:2893};
+let DESIGN_LINE = {xl:822,xr:1432,y:2893};
 
 /* ---------- example lesson (the teacher's own science lesson) ---------- */
 const SAMPLE_PREP = `المادة: العلوم
@@ -269,7 +277,7 @@ setData(SAMPLE_DATA);
 const canvas=document.createElement("canvas"); canvas.width=W; canvas.height=H;
 const ctx=canvas.getContext("2d");
 const tpl=new Image();
-const tplReady=new Promise(r=>{tpl.onload=r; tpl.src=TEMPLATE_SRC});
+let tplReady=new Promise(r=>{tpl.onload=r; tpl.src=TEMPLATE_SRC});
 let FONT="Baloo Bhaijaan 2", WEIGHT="600";
 async function loadFont(){
   [FONT,WEIGHT]=$("fontSel").value.split("|");
@@ -421,12 +429,15 @@ function drawDur(key,val){
   const d=DUR[key]; const px=ctx.getImageData(d.probe[0],d.probe[1],1,1).data;
   ctx.fillStyle=`rgb(${px[0]},${px[1]},${px[2]})`; ctx.fillRect(...d.box);
   const st=key==="warmup_min"?styleOf("warmup"):styleOf(key==="final_min"?"final":"closure");
-  ctx.font=fontFor(st,42); ctx.fillStyle=key==="warmup_min"?(st.color||HEAD_BLUE):INK; ctx.direction="ltr"; ctx.textAlign="center"; ctx.fillText(v,d.cx,d.base);
+  ctx.font=fontFor(st,42); ctx.fillStyle=d.color||(key==="warmup_min"?(st.color||HEAD_BLUE):INK); ctx.direction="ltr"; ctx.textAlign="center"; ctx.fillText(v,d.cx,d.base);
 }
-function drawDate(val){
-  if(!val) return; const st=styleOf("date"), b=sizeFor(st,46);
+function drawDate(val,cfg){
+  const DATE=cfg||window.__DATE_CFG; if(!val||!DATE) return; const st=styleOf("date"), b=sizeFor(st,46);
   ctx.fillStyle=st.color||HEAD_RED; ctx.direction="ltr"; ctx.textAlign="center";
   const parts=toLatinDigits(val).split(/[\/\-.\s]+/).filter(Boolean);
+  if(DATE.line){ const t=parts.length===3?(()=>{let [a,bb,c]=parts; if(a.length===4)[a,bb,c]=[c,bb,a]; return `${a} / ${bb} / ${c}`;})():toLatinDigits(val);
+    const {xl,xr}=DATE.line; let s=b; ctx.font=fontFor(st,s); while(ctx.measureText(t).width>xr-xl&&s>20){s--;ctx.font=fontFor(st,s)}
+    ctx.fillText(t,(xl+xr)/2,DATE.y-12); return; }
   if(parts.length===3){
     let [a,bb,c]=parts; if(a.length===4) [a,bb,c]=[c,bb,a];
     const vals=[a,bb,c];
@@ -435,7 +446,7 @@ function drawDate(val){
 }
 
 /* sections of the printed template: outer frame, heading text box (dark text / light text), free content area */
-const SECTIONS={
+let SECTIONS={
   header:{name:"الترويسة العلوية",box:[40,245,2080,718],content:[60,265,2060,705]},
   path:{name:"مسار الدرس",box:[50,728,1224,1930],head:[580,762,912,836,"dark"],headL:450,content:[70,860,1210,1910]},
   outcomes:{name:"مخرجات التعلم",box:[1231,728,2075,1430],head:[1408,766,2044,830,"dark"],content:[1250,870,2060,1415]},
@@ -479,7 +490,7 @@ function recolorHeading(x,hd,hex){
 }
 
 /* the template's dotted writing lines, erased when «إظهار خطوط التسطير» is off (evaluator, signature and date lines stay) */
-const RULES = [
+let RULES = [
   [82,971,323],[81,1237,383],[81,971,447],[81,1237,511],[81,1062,578],[233,1237,648],
   [1301,1859,324],[1301,1858,465],[1301,1849,532],[1301,1857,599],[1301,1735,662],
   ...[921,974,1027,1080,1136,1189,1241,1295,1349,1403,1457,1512,1566,1620,1675,1731,1785,1839,1892,2096,2151,2206,2263].map(y=>[78,1197,y]),
@@ -488,8 +499,181 @@ const RULES = [
   ...[1579,1628,1678,1727,1778,1828,2034,2085,2137,2189,2240].map(y=>[1260,2051,y]),
 ];
 let unruled=null, baseCache={key:"",canvas:null};
+/* ---------- second template: «القالب البنفسجي» (EVA, purple sections) ---------- */
+const TPL_PURPLE = {
+  id:"purple", name:"القالب البنفسجي", src:TEMPLATE2_SRC,
+  GEO:{
+    day:{lines:[{xl:1285,xr:1822,y:342}],size:50,single:true,color:HEAD_RED},
+    grade:{lines:[{xl:1280,xr:1830,y:453}],size:50,single:true,color:HEAD_RED},
+    section:{lines:[{xl:1280,xr:1830,y:508}],size:50,single:true,color:HEAD_RED},
+    subject:{lines:[{xl:1280,xr:1836,y:569}],size:50,single:true,color:HEAD_RED},
+    title:{lines:[{xl:1284,xr:1718,y:626}],size:50,single:true,color:HEAD_RED},
+    methods:{lines:[{xl:100,xr:920,y:351}],size:50,para:true,color:HEAD_BLUE},
+    resources:{lines:[{xl:100,xr:890,y:413},{xl:100,xr:890,y:481}],size:50,para:true,color:HEAD_BLUE},
+    warmup:{lines:[{xl:100,xr:1166,y:549},{xl:100,xr:1012,y:614}],size:50,para:true,color:HEAD_BLUE},
+    path:{lines:L(96,1188,[959,1036,1114,1191,1269,1347,1424,1502,1580,1655,1736,1810,1891,1969]),size:50,marker:"num",flow:{y0:959,y1:1985}},
+    outcomes:{lines:L(1280,2022,[905,974,1044,1116,1186]),size:50,marker:"dot",flow:{y0:880,y1:1236}},
+    formative:{lines:L(1284,2022,[1474,1548,1619,1694,1766,1841,1913]),size:50,marker:"dot",flow:{y0:1474,y1:1930}},
+    final:{lines:L(1132,2026,[2175,2236,2297,2358]),size:44,marker:"dot",flow:{y0:2175,y1:2372}},
+    closure:{lines:L(96,1022,[2175,2235,2296,2358]),size:44,marker:"auto",flow:{y0:2175,y1:2372}},
+    intro:{lines:L(716,1190,[2547,2607,2669,2730]),size:46,marker:"auto",flow:{y0:2547,y1:2745}},
+    gifted:{lines:L(96,614,[2547,2607,2668,2733]),size:46,marker:"auto",flow:{y0:2547,y1:2745}},
+  },
+  DUR:{
+    closure_min:{box:[180,2093,45,15],probe:[202,2088],cx:202,base:2108},
+    final_min:{box:[1216,2093,45,15],probe:[1238,2088],cx:1238,base:2108},
+  },
+  DATE:{line:{xl:1280,xr:1830}, y:396},
+  DESIGN_LINE:{xl:1380,xr:1640,y:2906},
+  SECTIONS:{
+    header:{name:"الترويسة العلوية",box:[40,280,2080,665],content:[60,300,2060,650]},
+    path:{name:"مسار الدرس",box:[61,734,1219,2017],head:[430,742,873,818,"dark"],content:[80,880,1200,2000]},
+    outcomes:{name:"مخرجات التعلم",box:[1247,734,2064,1252],head:[1297,750,2037,805,"dark"],content:[1265,860,2050,1240]},
+    formative:{name:"التقويم المرحلي",box:[1247,1288,2064,2009],head:[1482,1300,1857,1360,"dark"],content:[1265,1420,2050,1995]},
+    final:{name:"التقويم النهائي",box:[1089,2050,2064,2388],head:[1593,2050,1912,2110,"dark"],content:[1105,2130,2050,2375]},
+    closure:{name:"إغلاق الدرس",box:[61,2050,1058,2388],head:[568,2050,859,2110,"dark"],content:[80,2130,1040,2375]},
+    intro:{name:"نشاط للأقل تحصيلاً",box:[679,2424,1233,2771],head:[790,2435,1219,2485,"dark"],content:[695,2500,1220,2760]},
+    gifted:{name:"نشاط للطالب المتميز",box:[61,2424,657,2771],head:[172,2435,637,2485,"dark"],content:[78,2500,640,2760]},
+    evaluator:{name:"ملاحظات الشخص المقيم",box:[1253,2424,2064,2771],head:[1441,2435,1990,2485,"dark"],content:[1270,2500,2050,2760]},
+    footer:{name:"تذييل الصفحة",content:[50,2830,2080,2990]},
+  },
+  RULES:[
+    [1278,1836,342],[1262,1846,396],[1264,1845,453],[1263,1845,508],[1263,1853,569],[1268,1733,626],
+    [86,936,351],[85,914,413],[85,1182,481],[85,1182,549],[87,1028,614],
+    ...[959,1036,1114,1191,1269,1347,1424,1502,1580,1655,1736,1810,1891,1969].map(y=>[82,1202,y]),
+    ...[905,974,1044,1116,1186].map(y=>[1265,2037,y]),
+    ...[1474,1548,1619,1694,1766,1841,1913].map(y=>[1270,2037,y]),
+    ...[2175,2236,2297,2358].flatMap(y=>[[82,1037,y],[1117,2043,y]]),
+    ...[2547,2607,2668,2733].flatMap(y=>[[82,628,y],[702,1210,y]]),
+  ],
+};
+const TEMPLATES={green:null, purple:TPL_PURPLE};
+let TPL_ID="green";
+function captureGreen(){ TEMPLATES.green={id:"green",name:"القالب الأخضر",src:TEMPLATE_SRC,GEO,DUR,DATE,DESIGN_LINE,SECTIONS,RULES}; }
+async function switchTemplate(id){
+  const T=TEMPLATES[id]; if(!T) return;
+  TPL_ID=id; ({GEO,DUR,DATE,DESIGN_LINE,SECTIONS,RULES}=T);
+  unruled=null; baseCache={key:"",canvas:null};
+  tplReady=new Promise(r=>{ tpl.onload=r; tpl.src=T.src; });
+  try{ localStorage.setItem("lp-template",id); }catch(e){}
+  await render();
+}
+captureGreen();
+/* ---------- the four illustrated EVA templates share one layout ---------- */
+function kidsTemplate(id,name,src,subjectXr){
+  const PATH=[959,1009,1059,1109,1159,1210,1259,1310,1361,1411,1461,1512,1563,1614,1665,1716,1767,1818,1869];
+  const OUT=[963,1016,1068,1121,1173,1225,1276,1328,1380], FORM=[1621,1669,1715,1763,1810], FIN=[2006,2055,2103,2151,2199];
+  return {
+    id,name,src,
+    GEO:{
+      day:{lines:[{xl:1300,xr:1895,y:402}],size:50,single:true,color:HEAD_RED},
+      grade:{lines:[{xl:1300,xr:1872,y:532}],size:50,single:true,color:HEAD_RED},
+      section:{lines:[{xl:1300,xr:1852,y:597}],size:50,single:true,color:HEAD_RED},
+      subject:{lines:[{xl:1300,xr:subjectXr,y:663}],size:50,single:true,color:HEAD_RED},
+      title:{lines:[{xl:1300,xr:1733,y:729}],size:50,single:true,color:HEAD_RED},
+      methods:{lines:[{xl:104,xr:955,y:405},{xl:104,xr:1230,y:466}],size:50,para:true,color:HEAD_BLUE},
+      resources:{lines:[{xl:104,xr:943,y:529},{xl:104,xr:1230,y:591}],size:50,para:true,color:HEAD_BLUE},
+      warmup:{lines:[{xl:104,xr:1080,y:654},{xl:262,xr:1230,y:718}],size:50,para:true,color:HEAD_BLUE},
+      path:{lines:PATH.map(y=>({xl:185,xr:y>=1700?910:(y<1020?1060:1140),y})),size:50,marker:"num"},
+      outcomes:{lines:OUT.map((y,i)=>({xl:i===0?1410:(y>=1220&&y<=1400?1330:1262),xr:y<=1000?1870:(y>=1080&&y<=1260?1925:2040),y})),size:50,marker:"dot"},
+      formative:{lines:FORM.map(y=>({xl:1262,xr:y>=1610&&y<=1810?1945:2040,y})),size:50,marker:"dot"},
+      final:{lines:L(1262,1875,FIN),size:50,marker:"dot"},
+      closure:{lines:[{xl:112,xr:840,y:2067},{xl:104,xr:1171,y:2117}],size:50,marker:"auto"},
+      homework:{lines:[{xl:104,xr:705,y:2169},{xl:104,xr:1171,y:2218}],size:50,marker:"auto"},
+      intro:{lines:[2383,2433,2482,2532,2581].map(y=>({xl:698,xr:y>=2470?985:1175,y})),size:46,marker:"auto"},
+      gifted:{lines:L(104,600,[2383,2433,2482,2532,2581]),size:46,marker:"auto"},
+    },
+    DUR:{
+      warmup_min:{box:[158,706,52,20],probe:[185,698],cx:184,base:728},
+      closure_min:{box:[241,1962,46,22],probe:[263,1950],cx:263,base:1984,color:"#FFFFFF"},
+      final_min:{box:[1377,1918,46,22],probe:[1400,1906],cx:1400,base:1940,color:"#FFFFFF"},
+    },
+    DATE:{segs:[[1752,1872],[1650,1740],[1548,1640]], y:468},
+    DESIGN_LINE:{xl:830,xr:1460,y:2822},
+    SECTIONS:{
+      header:{name:"الترويسة العلوية",box:[40,350,2080,760],content:[60,370,2060,745]},
+      path:{name:"مسار الدرس",box:[40,790,1240,1910],head:[440,800,940,880,"light"],content:[70,920,1210,1890]},
+      outcomes:{name:"مخرجات التعلم",box:[1240,790,2080,1430],head:[1450,800,2060,860,"light"],content:[1260,930,2060,1410]},
+      formative:{name:"التقويم المرحلي",box:[1240,1450,2080,1870],head:[1450,1460,2000,1520,"light"],content:[1260,1550,2060,1850]},
+      final:{name:"التقويم النهائي",box:[1240,1880,2080,2250],head:[1450,1890,2060,1950,"light"],content:[1260,1980,1880,2240]},
+      closure:{name:"إغلاق الدرس",box:[40,1925,1240,2620],head:[500,1935,1100,1995,"light"],content:[70,2040,1210,2240]},
+      intro:{name:"نشاط للأقل تحصيلاً",frame:"closure",head:[690,2280,1180,2340,"dark"],content:[690,2360,1210,2610]},
+      gifted:{name:"نشاط للطالب المتميز",frame:"closure",head:[130,2280,660,2340,"dark"],content:[70,2360,660,2610]},
+      evaluator:{name:"ملاحظات الشخص المقيم",box:[1240,2265,2080,2620],head:[1450,2275,2060,2335,"light"],content:[1260,2360,2060,2610]},
+      footer:{name:"تذييل الصفحة",content:[40,2650,2080,2900]},
+    },
+    RULES:[
+      [1290,1902,402],[1290,1878,532],[1290,1860,597],[1290,subjectXr+8,663],[1290,1740,729],
+      [95,962,405],[95,1238,466],[95,950,529],[95,1238,591],[95,1087,654],[255,1238,718],
+      ...PATH.map(y=>[60,1195,y]),
+      [1400,2052,963], ...OUT.slice(1).map(y=>[1250,2052,y]),
+      ...FORM.map(y=>[1250,2052,y]), ...FIN.map(y=>[1250,1882,y]),
+      [104,934,2067],[95,1178,2117],[95,736,2169],[95,1178,2218],
+      ...[2383,2433,2482,2532,2581].flatMap(y=>[[90,652,y],[688,1182,y]]),
+    ],
+  };
+}
+TEMPLATES.sci1=kidsTemplate("sci1","العلوم الملوّن",TEMPLATE_SCI1_SRC,1733);
+TEMPLATES.sci2=kidsTemplate("sci2","العلوم الأزرق",TEMPLATE_SCI2_SRC,1733);
+TEMPLATES.arabic=kidsTemplate("arabic","اللغة العربية",TEMPLATE_AR_SRC,1733);
+TEMPLATES.colorful=kidsTemplate("colorful","المدرسي الملوّن",TEMPLATE_COL_SRC,1871);
+/* ---------- «القالب الفيروزي»: adds حكمة اليوم، التاريخ الهجري، الحصة، معلم الصف ---------- */
+TEMPLATES.teal={
+  id:"teal", name:"الفيروزي", src:TEMPLATE_TEAL_SRC,
+  GEO:{
+    wisdom:{lines:[{xl:800,xr:1750,y:347}],size:44,single:true,color:INK},
+    day:{lines:[{xl:1607,xr:1902,y:488}],size:46,single:true,color:HEAD_RED},
+    grade:{lines:[{xl:1770,xr:1910,y:647}],size:46,single:true,color:HEAD_RED},
+    section:{lines:[{xl:1480,xr:1632,y:647}],size:46,single:true,color:HEAD_RED},
+    period:{lines:[{xl:1140,xr:1352,y:647}],size:46,single:true,color:HEAD_RED},
+    subject:{lines:[{xl:1140,xr:1890,y:728}],size:46,single:true,color:HEAD_RED},
+    title:{lines:[{xl:1140,xr:1780,y:806}],size:46,single:true,color:HEAD_RED},
+    methods:{lines:[{xl:110,xr:695,y:529},{xl:110,xr:1046,y:585}],size:50,para:true,color:HEAD_BLUE},
+    resources:{lines:[{xl:110,xr:588,y:726},{xl:110,xr:1046,y:773}],size:50,para:true,color:HEAD_BLUE},
+    warmup:{lines:[{xl:232,xr:830,y:899}],size:50,para:true,color:HEAD_BLUE},
+    path:{lines:L(110,1050,[1160,1218,1280,1342,1403,1466,1528,1591,1654,1716,1778,1841,1903]),size:50,marker:"num"},
+    closure:{lines:[{xl:222,xr:752,y:2014}],size:46,para:true},
+    homework:{lines:[{xl:115,xr:735,y:2130}],size:46,para:true},
+    outcomes:{lines:L(1268,2010,[1113,1174,1235,1293,1351,1413,1475,1537]),size:50,marker:"dot",durX:1185},
+    formative:{lines:[{xl:1135,xr:1660,y:1677},...L(1135,2010,[1734,1791,1851,1910])],size:50,marker:"dot"},
+    final:{lines:[{xl:1250,xr:2010,y:2073}],size:46,para:true},
+    intro:{lines:L(110,610,[2316,2371]),size:44,marker:"auto"},
+    gifted:{lines:L(685,1185,[2316,2371]),size:44,marker:"auto"},
+  },
+  DUR:{
+    warmup_min:{box:[140,880,72,26],probe:[176,872],cx:176,base:906},
+    closure_min:{box:[128,1996,80,26],probe:[168,1988],cx:168,base:2022},
+    final_min:{box:[1158,2054,74,26],probe:[1195,2046],cx:1195,base:2081},
+  },
+  DATE:{segs:[[1382,1448],[1298,1370],[1156,1287]], y:488},
+  HIJRI:{segs:[[1358,1448],[1268,1348],[1156,1257]], y:572},
+  DESIGN_LINE:{xl:125,xr:525,y:356},
+  SECTIONS:{
+    header:{name:"الترويسة العلوية",box:[60,300,2040,930],content:[80,400,2020,915]},
+    path:{name:"مسار الدرس",box:[60,1040,1080,2150],head:[250,1060,900,1110,"light"],content:[80,1130,1060,1930]},
+    outcomes:{name:"مخرجات التعلم",box:[1105,1040,2040,1560],head:[1260,1060,2020,1105,"light"],content:[1120,1110,2020,1550]},
+    formative:{name:"التقويم المرحلي",box:[1105,1570,2040,2150],head:[1660,1585,2020,1640,"light"],content:[1120,1650,2020,1930]},
+    final:{name:"التقويم النهائي",box:[1105,1570,2040,2150],head:[1660,1955,2020,2010,"light"],content:[1120,2030,2020,2120]},
+    closure:{name:"إغلاق الدرس",box:[60,1040,1080,2150],head:[750,1950,1060,1995,"light"],content:[80,1990,1060,2140]},
+    intro:{name:"نشاط للأقل تحصيلاً",box:[70,2180,650,2400],content:[85,2280,640,2390]},
+    gifted:{name:"نشاط للطالب المتميز",box:[655,2180,1225,2400],content:[670,2280,1215,2390]},
+    evaluator:{name:"ملاحظات الشخص المقيم",box:[70,2420,2040,2620],content:[90,2480,2020,2610]},
+    footer:{name:"تذييل الصفحة",content:[40,2780,2080,2960]},
+  },
+  RULES:[
+    [793,1762,347],[112,528,347],[1600,1908,488],[1765,1912,647],[1478,1638,647],[1135,1357,647],[1132,1897,728],[1132,1787,806],[1132,2012,887],
+    [100,1052,529],[100,1052,585],[100,1052,726],[100,1052,773],[222,1052,899],
+    ...[1160,1218,1280,1342,1403,1466,1528,1591,1654,1716,1778,1841,1903].map(y=>[100,1062,y]),
+    [212,1062,2014],[105,1062,2130],
+    ...[1113,1174,1235,1293,1351,1413,1475,1537].flatMap(y=>[[1125,1245,y],[1262,2020,y]]),
+    ...[1677,1734,1791,1851,1910].map(y=>[1125,2020,y]),[1235,2022,2073],
+    ...[2316,2371].flatMap(y=>[[102,617,y],[677,1192,y]]),
+  ],
+};
+
+
 function baseSheet(){
-  const ruled=$("ruled").checked, key=ruled+"|"+JSON.stringify(design.borders)+"|"+JSON.stringify(design.headings);
+  const ruled=$("ruled").checked, key=TPL_ID+"|"+ruled+"|"+JSON.stringify(design.borders)+"|"+JSON.stringify(design.headings);
   if(baseCache.key===key) return baseCache.canvas;
   const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d",{willReadFrequently:true});
   if(ruled) x.drawImage(tpl,0,0,W,H); else { unruled=unruled||buildUnruled(); x.drawImage(unruled,0,0); }
@@ -528,15 +712,16 @@ async function drawDecos(){
 function buildUnruled(){
   const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d",{willReadFrequently:true});
   x.drawImage(tpl,0,0,W,H);
-  const isLine=(d,i)=>{const R=d[i],G=d[i+1],B=d[i+2]; return (B-R>28&&B>110&&B-G>8)||(R+G+B<300);};
+  const isLine=(d,i)=>{const R=d[i],G=d[i+1],B=d[i+2]; return (B-R>14&&B>90&&B-G>4)||(R+G+B<300);};
   for(const [x0,x1,y] of RULES){
     const top=y-7, h=15, w=x1-x0, P=6;            // band around the line, plus clean rows above and below it
     const img=x.getImageData(x0,top-P,w,h+2*P), d=img.data, W2=w;
     for(let col=0;col<w;col++){
       const iu=(0*W2+col)*4, il=((h+2*P-1)*W2+col)*4;
-      for(let r=P;r<P+h;r++){ const i=(r*W2+col)*4; if(!isLine(d,i)) continue;
-        const t=(r-P+1)/(h+1);                        // interpolate the ground (paper or watermark) from above/below
-        d[i]=d[iu]*(1-t)+d[il]*t; d[i+1]=d[iu+1]*(1-t)+d[il+1]*t; d[i+2]=d[iu+2]*(1-t)+d[il+2]*t; }
+      for(let r=P;r<P+h;r++){ const i=(r*W2+col)*4;
+        const t=(r-P+1)/(h+1), tr=d[iu]*(1-t)+d[il]*t, tg=d[iu+1]*(1-t)+d[il+1]*t, tb=d[iu+2]*(1-t)+d[il+2]*t;
+        if(!isLine(d,i) && (tr+tg+tb)-(d[i]+d[i+1]+d[i+2])<45) continue;   // keep pixels that match the ground
+        d[i]=tr; d[i+1]=tg; d[i+2]=tb; }
     }
     x.putImageData(img,x0,top-P);
   }
@@ -556,7 +741,8 @@ async function render(){
   ctx.drawImage(baseSheet(),0,0);
   const d=getData(), warn=[];
   for(const k of Object.keys(GEO)) drawField(k,d[k],warn);
-  drawDate(d.date);
+  if(d.homework&&!GEO.homework) warn.push("الواجب المنزلي (لا خانة له في هذا القالب)");
+  drawDate(d.date,DATE); if(TEMPLATES[TPL_ID]?.HIJRI) drawDate(d.hijri,TEMPLATES[TPL_ID].HIJRI);
   drawFooter(d.teacher);
   for(const k of Object.keys(DUR)) drawDur(k,d[k]);
   await drawDecos();
@@ -565,6 +751,16 @@ async function render(){
   else w.hidden=true;
   canvas.toBlob(b=>{ if(!b) return; if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl); lastBlobUrl=URL.createObjectURL(b); $("out").src=lastBlobUrl; },"image/png");
 }
+
+/* ---------- template gallery ---------- */
+const THUMBS={teal:"thumb-teal.jpg",green:"thumb-green.jpg",purple:"thumb-purple.jpg",sci1:"thumb-sci1.jpg",sci2:"thumb-sci2.jpg",arabic:"thumb-arabic.jpg",colorful:"thumb-colorful.jpg"};
+function markGallery(){ for(const b of $("tplGallery").children) b.setAttribute("aria-checked",String(b.dataset.id===TPL_ID)); }
+for(const id of ["green","purple","sci1","sci2","arabic","colorful","teal"]){
+  const b=document.createElement("button"); b.type="button"; b.className="tpl-card"; b.dataset.id=id; b.setAttribute("role","radio");
+  const im=document.createElement("img"); im.src=THUMBS[id]; im.alt=""; const t=document.createElement("span"); t.textContent=TEMPLATES[id].name;
+  b.append(im,t); b.addEventListener("click",async()=>{ await switchTemplate(id); markGallery(); }); $("tplGallery").append(b);
+}
+(()=>{ let id="green"; try{ id=localStorage.getItem("lp-template")||"green"; }catch(e){} if(!TEMPLATES[id]) id="green"; if(id!=="green") switchTemplate(id).then(markGallery); markGallery(); })();
 
 /* ---------- توزيع التحضير على الحقول بلا ذكاء اصطناعي: يتعرّف على عناوين الأقسام ---------- */
 const FIELD_NAMES=Object.fromEntries(SCHEMA.map(([k,l])=>[k,l]));
@@ -583,7 +779,9 @@ const ALIASES={
   intro:["نشاط للأقل تحصيلاً","نشاط للأقل تحصيلا","نشاط علاجي","النشاط العلاجي","الأنشطة العلاجية","نشاط تمهيدي","نشاط للطلاب المتعثرين","العلاج"],
   gifted:["نشاط للطالب المتميز","نشاط للطلاب المتميزين","نشاط إثرائي","النشاط الإثرائي","الأنشطة الإثرائية","الإثراء","نشاط للمتميزين"],
   dayDate:["اليوم والتاريخ","التاريخ واليوم"],
-  extra:["الواجب","الواجب المنزلي","الواجبات","ملاحظات","ملاحظات المعلم","المراجع"],
+  hijri:["التاريخ الهجري","الهجري"], period:["الحصة","رقم الحصة"], wisdom:["حكمة اليوم","الحكمة"],
+  homework:["الواجب المنزلي","الواجب","الواجبات","الواجب البيتي","النشاط البيتي"],
+  extra:["ملاحظات","ملاحظات المعلم","المراجع"],
 };
 const normAr=s=>s.replace(/[ً-ٰٟـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/\s+/g," ").trim();
 const ALIAS_LIST=Object.entries(ALIASES).flatMap(([k,arr])=>arr.map(a=>[normAr(a),k])).sort((a,b)=>b[0].length-a[0].length);
@@ -623,7 +821,7 @@ function parsePrep(text){
     ls=ls.filter(l=>{ const m=normAr(l).match(/^المده\s*[:：]?\s*([\d٠-٩]{1,3})/); if(m){ durs[k]=m[1]; return false; } return true; });
     if(k==="outcomes") ls=ls.map(l=>{ const m=l.match(/^(.*?)[\s\-–،,]*\(?\s*([\d٠-٩]{1,3})\s*(?:د|دق|دقيقة|دقائق)\s*\)?\s*$/); return m&&m[1]?`${m[1].trim()} | ${toLatinDigits(m[2])}`:l; });
     const g=GEO[k];
-    d[k]=(g&&(g.para||g.single))||k==="teacher"||k==="date"||k==="day" ? ls.join(" ") : ls.join("\n");
+    d[k]=(g&&(g.para||g.single))||["teacher","date","day","hijri","period","wisdom"].includes(k) ? ls.join(" ") : ls.join("\n");
   }
   // header facts written without a colon, e.g. «الصف الثاني - شعبة أ»
   for(const l of unknown){ const n=l.replace(/[\u064B-\u065F]/g,"");
@@ -632,10 +830,14 @@ function parsePrep(text){
   const extra=(out.extra||[]);
   for(const [k,v] of Object.entries(durs)){ const t=k+"_min"; if(t in d&&!d[t]) d[t]=toLatinDigits(v); }
   if(d.date) d.date=toLatinDigits(d.date);
+  if(d.hijri) d.hijri=toLatinDigits(d.hijri);
   return {data:d, unknown:unknown.filter(l=>!/^\s*الصف\s/.test(l.replace(/[\u064B-\u065F]/g,""))), extra};
 }
 const PREP_TEMPLATE=`اليوم:
 التاريخ:
+التاريخ الهجري:
+الحصة:
+حكمة اليوم:
 الصف:
 الشعبة:
 المادة:
@@ -653,6 +855,7 @@ const PREP_TEMPLATE=`اليوم:
 التقويم النهائي (10 د):
 -
 إغلاق الدرس (5 د):
+الواجب المنزلي:
 نشاط للأقل تحصيلاً:
 نشاط للطالب المتميز:`;
 function showReport(d,unknown,extra){
