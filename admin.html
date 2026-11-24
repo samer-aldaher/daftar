@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>إدارة المعلمين | دفتر التحضير</title>
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#F3F6F1;--surface:#fff;--fg:#1B2433;--muted:#5B6676;--line:#DCE3D8;--accent:#2E7D32;--accent-ink:#fff;--danger:#B3261E;--warn-bg:#FFF4E5;--warn-fg:#8A4B00;--ok-bg:#E3F1E4;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#121712;--surface:#1B221B;--fg:#E6ECE4;--muted:#9AA79A;--line:#2E3A2E;--accent:#5DBB63;--accent-ink:#0E1A0F;--danger:#FF8A80;--warn-bg:#3A2A12;--warn-fg:#FFD49A;--ok-bg:#21402A;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 "Tajawal",system-ui,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+h1{font-size:1.5rem;margin:0}h2{font-size:1.15rem;margin:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.hint{color:var(--muted);font-size:.88rem}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:620px){.grid{grid-template-columns:1fr}}
+label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.9rem}
+input,select,textarea{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);width:100%}
+button,.filebtn span{font:inherit;font-weight:700;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;display:inline-block}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.sm{padding:6px 10px;font-size:.85rem}
+button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.danger-soft{color:var(--danger)}
+.banner{border-radius:12px;padding:12px 14px;background:var(--warn-bg);color:var(--warn-fg);font-weight:700}
+.banner.ok{background:var(--ok-bg);color:var(--fg)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:start;vertical-align:middle}
+.tw{overflow-x:auto}
+code{white-space:nowrap;font-family:ui-monospace,Menlo,Consolas,monospace;direction:ltr;unicode-bidi:isolate;background:var(--bg);padding:2px 6px;border-radius:6px}
+.st{font-size:.8rem;font-weight:700;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.st.on{background:var(--ok-bg)}.st.off{background:var(--warn-bg);color:var(--warn-fg)}
+tr.off td:not(:last-child){opacity:.6}
+textarea{font-family:ui-monospace,Menlo,Consolas,monospace;direction:ltr;font-size:.8rem;min-height:110px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:12px;font-weight:700;max-width:calc(100vw - 32px);text-align:center}
+@media (max-width:620px){thead{display:none}table,tbody,tr,td{display:block}tr{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}td{border:0;padding:3px 0}td:nth-child(2),td:nth-child(3),td:nth-child(4){display:inline-block;margin-inline-end:8px}}
+[hidden]{display:none!important}
+ol{margin:0;padding-inline-start:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="row" style="justify-content:space-between">
+    <div><h1>إدارة معلمي دفتر التحضير</h1><span class="hint">صفحة خاصة بالمدرب سامر الضاهر. قائمة الأسماء والرموز محفوظة في هذا المتصفح فقط.</span></div>
+    <a href="./" class="hint">← إلى التطبيق</a>
+  </header>
+
+  <div id="dirty" class="banner" hidden>عندك تغييرات لم تُنشر بعد. انسخ محتوى users.json من الأسفل وضعه في المستودع حتى تسري.</div>
+
+  <section class="panel">
+    <h2>إضافة معلم</h2>
+    <div class="grid">
+      <label>اسم المعلم/ة (لك فقط)<input id="nName" placeholder="مثال: أ. ريم الحسن"></label>
+      <label>اسم المستخدم<input id="nUser" dir="ltr" autocapitalize="none" spellcheck="false" placeholder="t001"></label>
+      <label>ملاحظة (اختياري)<input id="nNote" placeholder="المدرسة أو المدينة"></label>
+    </div>
+    <div class="row"><button class="primary" id="addBtn">إضافة وتوليد رمز</button><span class="hint">اسم المستخدم بالإنجليزية أو الأرقام، بلا مسافات.</span></div>
+  </section>
+
+  <section class="panel">
+    <div class="row" style="justify-content:space-between"><h2>المعلمون</h2><span class="hint" id="count"></span></div>
+    <input id="q" type="search" placeholder="ابحث بالاسم أو اسم المستخدم">
+    <div class="tw"><table><thead><tr><th>المعلم</th><th>اسم المستخدم</th><th>الرمز</th><th>الحالة</th><th></th></tr></thead><tbody id="list"></tbody></table></div>
+    <p class="hint" id="empty">لم تضف أي معلم بعد.</p>
+  </section>
+
+  <section class="panel">
+    <h2>نشر القائمة على الموقع</h2>
+    <ol class="hint">
+      <li>اضغط «نسخ users.json».</li>
+      <li>في مستودع daftar افتح الملف <code>users.json</code> واضغط ✏️ (أول مرة: Add file ← Create new file واكتب الاسم <code>users.json</code>).</li>
+      <li>احذف كل ما فيه، والصق، ثم Commit changes. يسري التغيير على المعلمين خلال دقائق.</li>
+    </ol>
+    <label>مدة العمل دون إنترنت قبل إعادة التحقق (بالأيام)<input id="grace" type="number" min="1" max="90" value="14" style="max-width:140px"></label>
+    <textarea id="json" readonly aria-label="محتوى users.json"></textarea>
+    <div class="row"><button class="primary" id="copyJson">نسخ users.json</button><button id="dlJson">تنزيل users.json</button><button id="markPub">نشرتُ القائمة</button></div>
+  </section>
+
+  <section class="panel">
+    <h2>نسخة احتياطية خاصة</h2>
+    <span class="hint">فيها الأسماء والرموز كما هي. احفظها عندك ولا ترفعها إلى GitHub أبدًا.</span>
+    <div class="row"><button id="bkOut">تنزيل النسخة الاحتياطية</button><label class="filebtn"><input type="file" id="bkIn" accept=".json" hidden><span>استرجاع نسخة</span></label></div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+/* ---------- personal-code sign-in: shared by the app and the admin page ----------
+   users.json holds only one-way PBKDF2 keys, never names or codes. */
+const AUTH_SALT="eva-daftar-v1|";
+function normUser(u){ return (u||"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).trim().toLowerCase().replace(/\s+/g,""); }
+function normCode(c){ return (c||"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).toUpperCase().replace(/[^A-Z0-9]/g,""); }
+async function authKey(user,code){
+  const u=normUser(user), c=normCode(code), enc=new TextEncoder();
+  const base=await crypto.subtle.importKey("raw",enc.encode(u+":"+c),"PBKDF2",false,["deriveBits"]);
+  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:enc.encode(AUTH_SALT+u),iterations:120000},base,256);
+  return [...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+const $=id=>document.getElementById(id);
+const K="eva-admin-roster";
+let R=(()=>{ try{ return JSON.parse(localStorage.getItem(K))||{users:[],grace:14,dirty:false}; }catch(e){ return {users:[],grace:14,dirty:false}; } })();
+const save=()=>{ try{ localStorage.setItem(K,JSON.stringify(R)); }catch(e){ toast("تعذّر الحفظ في المتصفح"); } };
+let tt; function toast(m){ const t=$("toast"); t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,3000); }
+const ALPH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function genCode(){ const a=new Uint32Array(8); crypto.getRandomValues(a); const s=[...a].map(x=>ALPH[x%ALPH.length]).join(""); return s.slice(0,4)+"-"+s.slice(4); }
+function nextUser(){ let n=R.users.length+1; while(R.users.some(u=>u.user==="t"+String(n).padStart(3,"0"))) n++; return "t"+String(n).padStart(3,"0"); }
+function msgFor(u){ return `مرحبًا ${u.name||""}،\nهذه بيانات دخولك إلى «دفتر التحضير الذكي» من أكاديمية EVA للتدريب:\n\nالرابط: https://samer-aldaher.github.io/daftar/\nاسم المستخدم: ${u.user}\nالرمز الشخصي: ${u.code}\n\nالرمز خاص بك، فلا تشاركه مع أحد.\nالمدرب سامر الضاهر`; }
+async function copy(t,ok){ try{ await navigator.clipboard.writeText(t); toast(ok); }catch(e){ const a=document.createElement("textarea"); a.value=t; document.body.append(a); a.select(); try{document.execCommand("copy"); toast(ok);}catch(_){ toast("انسخ النص يدويًا"); } a.remove(); } }
+function confirmTap(btn,label,fn){ if(btn.dataset.armed){ fn(); return; } const t=btn.textContent; btn.dataset.armed=1; btn.textContent=label; btn.classList.add("danger"); setTimeout(()=>{ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent=t; btn.classList.remove("danger"); } },4000); }
+function touch(){ R.dirty=true; save(); draw(); }
+async function buildJson(){
+  const keys=[]; for(const u of R.users) if(u.active){ if(!u.key||u.keyFor!==u.user+":"+u.code){ u.key=await authKey(u.user,u.code); u.keyFor=u.user+":"+u.code; } keys.push(u.key); }
+  save(); keys.sort();
+  return JSON.stringify({app:"eva-daftar",version:1,graceDays:R.grace||14,updated:new Date().toISOString().slice(0,10),keys},null,1);
+}
+async function draw(){
+  const q=($("q").value||"").toLowerCase(), tb=$("list"); tb.replaceChildren();
+  const rows=R.users.filter(u=>!q||(u.name+" "+u.user+" "+(u.note||"")).toLowerCase().includes(q));
+  for(const u of rows){
+    const tr=document.createElement("tr"); if(!u.active) tr.className="off";
+    const td=(...k)=>{ const c=document.createElement("td"); c.append(...k); tr.append(c); return c; };
+    const nm=document.createElement("div"); nm.textContent=u.name||"—"; if(u.note){ const s=document.createElement("div"); s.className="hint"; s.textContent=u.note; nm.append(s); }
+    td(nm); const c1=document.createElement("code"); c1.textContent=u.user; td(c1); const c2=document.createElement("code"); c2.textContent=u.code; td(c2);
+    const st=document.createElement("span"); st.className="st "+(u.active?"on":"off"); st.textContent=u.active?"مفعّل":"موقوف"; td(st);
+    const b=(t,cls,fn)=>{ const x=document.createElement("button"); x.className="sm "+(cls||""); x.textContent=t; x.addEventListener("click",()=>fn(x)); return x; };
+    const act=td(); act.className="row";
+    act.append(
+      b("نسخ رسالة الدخول","",()=>copy(msgFor(u),"نُسخت الرسالة، أرسلها للمعلم")),
+      b(u.active?"إيقاف":"تفعيل",u.active?"danger-soft":"",()=>{ u.active=!u.active; touch(); toast(u.active?"فُعّل الحساب. انشر القائمة.":"أُوقف الحساب. انشر القائمة حتى يسري."); }),
+      b("رمز جديد","",x=>confirmTap(x,"تأكيد رمز جديد",()=>{ u.code=genCode(); touch(); toast("تغيّر الرمز. أرسل الرمز الجديد وانشر القائمة."); })),
+      b("حذف","danger-soft",x=>confirmTap(x,"تأكيد الحذف",()=>{ R.users=R.users.filter(v=>v!==u); touch(); toast("حُذف المعلم. انشر القائمة."); }))
+    );
+    tb.append(tr);
+  }
+  $("empty").hidden=R.users.length>0;
+  const on=R.users.filter(u=>u.active).length; $("count").textContent=R.users.length?`${R.users.length} معلم · ${on} مفعّل`:"";
+  $("dirty").hidden=!R.dirty; $("nUser").placeholder=nextUser(); $("grace").value=R.grace||14;
+  $("json").value=await buildJson();
+}
+$("addBtn").addEventListener("click",()=>{
+  const user=normUser($("nUser").value)||nextUser();
+  if(!/^[a-z0-9._-]{2,24}$/.test(user)){ toast("اسم المستخدم: حروف إنجليزية أو أرقام فقط، بلا مسافات"); return; }
+  if(R.users.some(u=>u.user===user)){ toast("اسم المستخدم موجود مسبقًا"); return; }
+  const u={name:$("nName").value.trim(),user,note:$("nNote").value.trim(),code:genCode(),active:true,added:new Date().toISOString().slice(0,10)};
+  R.users.unshift(u); $("nName").value=$("nUser").value=$("nNote").value=""; touch(); copy(msgFor(u),"أُضيف المعلم ونُسخت رسالة دخوله");
+});
+$("q").addEventListener("input",draw);
+$("grace").addEventListener("change",()=>{ R.grace=Math.min(90,Math.max(1,+$("grace").value||14)); touch(); });
+$("copyJson").addEventListener("click",async()=>copy(await buildJson(),"نُسخ users.json. الصقه في المستودع."));
+$("dlJson").addEventListener("click",async()=>{ const b=new Blob([await buildJson()],{type:"application/json"}), a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="users.json"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),9000); });
+$("markPub").addEventListener("click",()=>{ R.dirty=false; save(); draw(); toast("تمام. ستُحدَّث حسابات المعلمين خلال دقائق."); });
+$("bkOut").addEventListener("click",()=>{ const b=new Blob([JSON.stringify({app:"eva-daftar-admin",...R},null,1)],{type:"application/json"}), a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="قائمة المعلمين - خاص - "+new Date().toISOString().slice(0,10)+".json"; a.click(); });
+$("bkIn").addEventListener("change",async e=>{ const f=e.target.files[0]; e.target.value=""; if(!f) return; try{ const j=JSON.parse(await f.text()); if(j.app!=="eva-daftar-admin"||!Array.isArray(j.users)) throw 0; R={users:j.users,grace:j.grace||14,dirty:true}; save(); draw(); toast(`استُرجع ${j.users.length} معلمًا`); }catch(_){ toast("هذا ليس ملف نسخة احتياطية لقائمة المعلمين"); } });
+draw();
+</script>
+</body>
+</html>
