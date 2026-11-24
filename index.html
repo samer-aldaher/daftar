@@ -1040,7 +1040,7 @@ const FIELD_NAMES=Object.fromEntries(SCHEMA.map(([k,l])=>[k,l]));
 const ALIASES={
   day:["اليوم"], date:["التاريخ"], grade:["الصف","الصف الدراسي"], section:["الشعبة","الشعبه","الفصل"],
   subject:["المادة","المادة الدراسية"], title:["عنوان الدرس","اسم الدرس","الدرس","موضوع الدرس","الموضوع","العنوان"],
-  teacher:["اسم المعلم","اسم المعلمة","المعلم","المعلمة","تصميم المعلم","تصميم المعلمة","تصميم المعلم/ة","إعداد"],
+  teacher:["اسم وتوقيع المعلم","اسم وتوقيع المعلمة","اسم وتوقيع المعلم/ة","توقيع المعلم","اسم المعلم","اسم المعلمة","المعلم","المعلمة","تصميم المعلم","تصميم المعلمة","تصميم المعلم/ة","إعداد"],
   methods:["طرائق التعلم","طرائق التعليم","طرائق التدريس","طرق التدريس","الطرائق","استراتيجيات التدريس","استراتيجيات التعلم","الاستراتيجيات","استراتيجيات التعليم","الاستراتيجية","استراتيجيات وطرائق التدريس","طرائق واستراتيجيات التدريس","طرائق واستراتيجيات التعلم","الاستراتيجيات والطرائق","أساليب التدريس","طرق التعلم"],
   resources:["مصادر التعلم","مصادر التعليم","الوسائل التعليمية","الوسائل","الوسائل والأدوات","الأدوات","المصادر","مصادر التعلم والوسائل","الوسائل والمصادر","الوسائل التعليمية والمصادر","مصادر التعلم والأدوات","المواد والأدوات","الأدوات والوسائل","الوسائل والأدوات التعليمية","الوسائل المستخدمة","التقنيات التعليمية"],
   warmup:["التهيئة","التمهيد","التهيئة الحافزة","تهيئة","المقدمة","التهيئة والتمهيد","التمهيد والتهيئة","التهيئة الحافزة للدرس","النشاط الاستهلالي","الافتتاحية","مقدمة الدرس","التهيئة للدرس"],
@@ -1054,17 +1054,19 @@ const ALIASES={
   dayDate:["اليوم والتاريخ","التاريخ واليوم"],
   hijri:["التاريخ الهجري","الهجري"], period:["الحصة","رقم الحصة"], wisdom:["حكمة اليوم","الحكمة"],
   homework:["الواجب المنزلي","الواجب","الواجبات","الواجب البيتي","النشاط البيتي","النشاط المنزلي","المهمة المنزلية","التكليف المنزلي","الواجب البيتي/المنزلي"],
-  extra:["ملاحظات","ملاحظات المعلم","المراجع"],
+  extra:["ملاحظات الشخص المقيم","ملاحظات المقيم","نقاط القوة","نقاط يجب معالجتها","نقاط الضعف","اسم وتوقيع المقيم","توقيع المقيم","اسم وتوقيع المدير","توقيع المدير","ملاحظات","ملاحظات المعلم","المراجع"],
 };
-const normAr=s=>s.replace(/[ً-ٰٟـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/\s+/g," ").trim();
+const normAr=s=>s.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,"").replace(/[ً-ٰٟـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/\s+/g," ").trim();
 const ALIAS_LIST=Object.entries(ALIASES).flatMap(([k,arr])=>arr.map(a=>[normAr(a),k])).sort((a,b)=>b[0].length-a[0].length);
 const DUR_RE=/\(?\s*(?:المدة\s*[:：]?\s*)?([\d٠-٩]{1,3})\s*(?:د|دق|دقيقة|دقائق)\s*\)?/;
 /* strip what chat assistants add around headings: markdown, emojis, ordinal words, numbering */
 const ORDINALS="(?:أول|ثاني|ثالث|رابع|خامس|سادس|سابع|ثامن|تاسع|عاشر)(?:اً|ًا|ا)";
 const LEAD_RE=new RegExp("^\\s*(?:#{1,6}\\s*)?(?:[-•*▪●◦►➤✓✔☑→]+\\s*)?(?:"+ORDINALS+"\\s*[:\\-–.)]?\\s*|[\\d٠-٩]+\\s*[-.)\\]]\\s*|[أ-ي]\\s*[-.)]\\s+)?","u");
 function cleanLine(line){
-  return line.replace(/\p{Extended_Pictographic}|️|‍/gu,"").replace(/\*\*|__|~~|`/g,"").replace(/^\s*>+\s*/,"").replace(/\s+$/,"");
+  return line.replace(/\p{Extended_Pictographic}|\uFE0F|[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/gu,"").replace(/\*\*|__|~~|`/g,"").replace(/^\s*>+\s*/,"").replace(/\s+$/,"");
 }
+/* blanks left in a template («…………», «…/…/…», «.....») are not content */
+function dePh(t){ const r=(t||"").replace(/(?:…|\.{2,}|ـ{2,}|_{3,})+/g," ").replace(/\s{2,}/g," ").trim(); return /[\p{L}\p{N}]/u.test(r)?r:""; }
 function headingOf(line){
   const raw=cleanLine(line).replace(LEAD_RE,"").replace(/^[\[(«"]+\s*/,"");
   const n=normAr(raw);
@@ -1073,15 +1075,17 @@ function headingOf(line){
     let rest=n.slice(a.length);
     // allow a duration right after the heading: «التهيئة 5 دقائق:» or «التهيئة (5 د)»
     const restNoDur=rest.replace(/^\s*[\[(]?\s*(?:المده\s*[:：]?\s*)?[\d٠-٩]{1,3}\s*(?:د|دق|دقيقه|دقائق)\s*[\])]?/,"");
-    const okEnd=r=>r===""||/^\s*[\])»"]?\s*$/.test(r)||/^\s*(\([^)]*\))?\s*[\])»"]?\s*[:：\-–]/.test(r)||/^\s*\([^)]*\)\s*$/.test(r);
+    const okEnd=r=>r===""||/^\s+[^:：.؟!،]{1,25}[:：]/.test(r)||/^\s*[\])»"]?\s*$/.test(r)||/^\s*(\([^)]*\))?\s*[\])»"]?\s*[:：\-–]/.test(r)||/^\s*\([^)]*\)\s*$/.test(r);
     if(okEnd(rest)||okEnd(restNoDur)){
       const ci=raw.search(/[:：]/), di=raw.search(/\s[-–]\s/);
       const cut=ci>=0?ci+1:(di>=0?di+2:raw.length);
-      const head=raw.slice(0,cut), body=raw.slice(cut).trim();
+      const head=raw.slice(0,cut); let body=dePh(raw.slice(cut));
       // a bare heading word must be the whole line; «الدرس الأول عن ...» is content, not a heading
-      if(ci<0&&di<0&&normAr(head).length>a.length+12) continue;
-      const dm=head.match(DUR_RE);
-      return {key:k, body, dur:dm?dm[1]:""};
+      if(ci<0&&di<0&&normAr(head).replace(/\([^)]*\)|\[[^\]]*\]/g,"").trim().length>a.length+12) continue;
+      const dm=head.match(DUR_RE); let dur=dm?dm[1]:"";
+      const bm=body.match(/^(?:المد[ةه]\s*[:：]?\s*)?[(\[]?\s*([\d٠-٩]{1,3})\s*[)\]]?\s*(?:د|دق|دقيقة|دقائق)?\.?$/);  // «التهيئة: (5) د»
+      if(bm){ dur=bm[1]; body=""; }
+      return {key:k, body, dur};
     }
   }
   return null;
@@ -1098,23 +1102,38 @@ function splitInline(line){
   return parts.filter(isHead).length>=2&&parts.every(p=>isHead(p)||!/[:：]/.test(p)) ? parts : [line];
 }
 /* markdown tables: «| الصف | الأول |» → «الصف: الأول» */
+/* tables: markdown «| a | b |» and the tab-separated text Gemini/ChatGPT give when a table is copied.
+   A row whose cell names a section becomes «القسم (المدة د): باقي الخلايا». */
+const DUR_CELL=/^[(\[]?\s*([\d٠-٩]{1,3})\s*[)\]]?\s*(?:د|دق|دقيقة|دقيقه|دقائق)?\.?$/;
 function untable(text){
   return text.split(/\r?\n/).filter(l=>!/^\s*\|?\s*:?-{2,}/.test(l)).map(l=>{
-    if(!/^\s*\|.*\|\s*$/.test(l)) return l;
-    const cells=l.trim().replace(/^\||\|$/g,"").split("|").map(x=>x.trim()).filter(Boolean);
-    if(cells.length===2&&headingOf(cells[0])) return cells[0].replace(/[:：]\s*$/,"")+": "+cells[1];
-    return cells.join(" – ");
+    let cells=null;
+    if(/^\s*\|.*\|\s*$/.test(l)) cells=l.trim().replace(/^\||\|$/g,"").split("|");
+    else if(/\t/.test(l)) cells=l.split("\t");
+    if(!cells) return l;
+    cells=cells.map(x=>cleanLine(x).trim()).filter(Boolean);
+    if(!cells.length) return "";
+    const hi=cells.findIndex(c=>c.length<=60&&headingOf(c)&&!headingOf(c).body);
+    if(hi<0) return cells.every(c=>/^(?:البند|التفاصيل|المرحل[ةه]|الاجراءات|الإجراءات|الزمن|المد[ةه]|النشاط|الانشط[ةه]|الأنشطة|المحتوى|العنصر|القسم|الوصف|دور المعلم|دور المتعلم|دور الطالب|التقويم)$/.test(normAr(c).replace(/[:：*]/g,"").trim()))?"":cells.join(" – ");
+    let dur=""; const rest=[];
+    cells.forEach((c,i)=>{ if(i===hi) return; const m=normAr(c).match(DUR_CELL); if(m&&!dur) dur=m[1]; else rest.push(c); });
+    const head=cells[hi].replace(/[:：]\s*$/,"");
+    return head+(dur?` (${dur} د)`:"")+": "+rest.join(" – ");
   }).join("\n");
 }
 function parsePrep(text){
-  const out={}, durs={}, unknown=[]; let cur=null;
+  const out={}, prev={}, durs={}, unknown=[]; let cur=null;
   for(const line of untable(text).split(/\r?\n/).flatMap(splitInline)){
     if(!cleanLine(line).trim()||/^\s*(?:-{3,}|\*{3,}|_{3,}|={3,})\s*$/.test(line)) continue;
     const h=headingOf(line);
-    if(h){ cur=h.key; out[cur]=out[cur]||[]; if(h.body) out[cur].push(h.body); if(h.dur) durs[cur]=h.dur; continue; }
-    const body=cleanLine(line).replace(/^\s*#{1,6}\s*/,"").trim();
+    if(h){ cur=h.key; if(out[cur]&&out[cur].length){ prev[cur]=out[cur]; out[cur]=[]; } out[cur]=out[cur]||[]; if(h.body) out[cur].push(h.body); if(h.dur) durs[cur]=h.dur;
+      if(h.body&&HEADER_KEYS.includes(cur)) cur=null;
+      continue; }
+    const body=dePh(cleanLine(line).replace(/^\s*#{1,6}\s*/,""));
+    if(!body) continue;
     if(cur) out[cur].push(body); else unknown.push(body);
   }
+  for(const k of Object.keys(prev)) if(!out[k]||!out[k].length) out[k]=prev[k];
   const d={}; for(const [k] of SCHEMA) d[k]="";
   const lineOf=v=>v.replace(/^\s*(?:[-•*▪●◦►➤✓✔☑→]|\d+\s*[-.)]|[٠-٩]+\s*[-.)])\s*/,"");
   for(const [k,lines] of Object.entries(out)){
@@ -1123,7 +1142,7 @@ function parsePrep(text){
     if(!(k in d)) continue;
     let ls=lines.map(lineOf).filter(Boolean);
     // a separate «المدة: 5» line inside a section
-    ls=ls.filter(l=>{ const m=normAr(l).match(/^المده\s*[:：]?\s*([\d٠-٩]{1,3})/); if(m){ durs[k]=m[1]; return false; } return true; });
+    ls=ls.filter(l=>{ const n=normAr(l); const m=n.match(/^المده\s*[:：]?\s*[(\[]?\s*([\d٠-٩]{1,3})/); if(m){ durs[k]=m[1]; return false; } return !/^المده\s*[:：]?\s*$/.test(n); });
     if(k==="outcomes") ls=ls.map(l=>{ const m=l.match(/^(.*?)[\s\-–،,]*[(\[]?\s*(?:المدة\s*[:：]?\s*)?([\d٠-٩]{1,3})\s*(?:د|دق|دقيقة|دقائق)\s*[)\]]?\s*\.?$/); return m&&m[1]?`${m[1].trim()} | ${toLatinDigits(m[2])}`:l; });
     const g=GEO[k];
     if(k==="methods"||k==="resources"){ d[k]=ls.map(l=>l.replace(/[،,.\s]+$/,"")).filter(Boolean).join("، "); continue; }
@@ -1138,7 +1157,7 @@ function parsePrep(text){
   for(const [k,v] of Object.entries(durs)){ const t=k+"_min"; if(t in d&&!d[t]) d[t]=toLatinDigits(v); }
   if(d.date) d.date=toLatinDigits(d.date);
   if(d.hijri) d.hijri=toLatinDigits(d.hijri);
-  return {data:d, unknown:unknown.filter(l=>!/^\s*(?:الصف\s|(?:تحضير|خطة|خطة تحضير)\s+(?:ال)?درس)/.test(l.replace(/[\u064B-\u065F]/g,""))), extra};
+  return {data:d, unknown:unknown.filter(l=>!/اكاديمي[ةه]\s*EVA/i.test(normAr(l))&&!/^\s*(?:الصف\s|(?:تحضير|خطة|خطة تحضير)\s+(?:ال)?درس)/.test(l.replace(/[\u064B-\u065F]/g,""))), extra};
 }
 const PREP_TEMPLATE=`اليوم:
 التاريخ:
@@ -1179,17 +1198,34 @@ function showReport(d,unknown,extra){
   box.hidden=false;
 }
 /* text with no recognisable headings: first short line is the title, «أن …» lines are outcomes, the rest is the lesson path */
+/* text with no recognisable headings: each line goes to the section its words point to */
+const GUESS=[
+  ["outcomes",/^ان\s+[يت]/],
+  ["homework",/(واجب|في المنزل|في البيت|منزلي|بيتي)/],
+  ["gifted",/(متميز|متفوق|اثرائي|موهوب|تحد)/],
+  ["intro",/(اقل تحصيل|علاجي|ضعاف|متعثر|بطيء التعلم)/],
+  ["closure",/(نختم|نلخص|تلخيص|خلاص[هة]|ختام|في نهاي[هة] الدرس|اغلاق)/],
+  ["warmup",/(تمهيد|تهيئ|نبدا|ابدا الدرس|اثار[هة] الدافعي[هة]|استهلال)/],
+  ["methods",/^(?:[^.؟]{0,15})?(استراتيجي|التعلم التعاوني|العصف الذهني|الحوار والمناقش|لعب الادوار|التعلم باللعب|الاستقصاء|التعلم بالاكتشاف|حل المشكلات|طرائق|طريق[هة] التدريس|فكر.?زاوج)/],
+  ["resources",/^(?:[^.؟]{0,15})?(الكتاب المدرسي|السبور|بطاقات|مجسم|جهاز العرض|عرض تقديمي|اوراق عمل|الوسائل|الادوات|لوح[هة])/],
+  ["formative",/(^(اذكر|عدد|ما |ماذا|لماذا|كيف|صل |صلي|اكمل|ضع|اختر|بين|علل|استخرج|صنف|قارن|حدد|هل|من |متى|اين|اجب)|؟\s*$)/],
+];
 function guessPrep(text){
   const d={}; for(const [k] of SCHEMA) d[k]="";
-  const lines=untable(text).split(/\r?\n/).map(l=>cleanLine(l).replace(/^\s*#{1,6}\s*/,"").trim()).filter(Boolean);
+  const lines=untable(text).split(/\r?\n/).map(l=>dePh(cleanLine(l).replace(/^\s*#{1,6}\s*/,""))).filter(Boolean);
   const strip=l=>l.replace(/^\s*(?:[-•*▪●◦►➤✓✔☑→]|[\d٠-٩]+\s*[-.)])\s*/,"");
-  const out=[], path=[];
-  lines.forEach((l,i)=>{ const t=strip(l);
-    if(i===0&&t.length<=60&&!/^أن\s/.test(t)){ d.title=t.replace(/^(?:درس|الدرس)\s*[:：-]?\s*/,""); return; }
-    if(/^أن\s/.test(t)){ const m=t.match(/^(.*?)[\s\-–،,]*[(\[]?\s*([\d٠-٩]{1,3})\s*(?:د|دق|دقيقة|دقائق)\s*[)\]]?\s*\.?$/); out.push(m&&m[1]?`${m[1].trim()} | ${toLatinDigits(m[2])}`:t); return; }
-    path.push(t);
+  const bins={}; GUESS.forEach(([k])=>bins[k]=[]); const path=[];
+  lines.forEach((l,i)=>{ const t=strip(l), n=normAr(t);
+    const g=n.match(/^الصف\s+([^\-–،,:]+)/); if(g&&!d.grade&&t.length<40){ d.grade=g[1].trim(); return; }
+    const sj=n.match(/^ماد[ةه]\s+(.+)/); if(sj&&!d.subject&&t.length<40){ d.subject=t.replace(/^ماد[ةه]\s+/,""); return; }
+    if(i===0&&t.length<=60&&!/^ان\s/.test(n)){ d.title=t.replace(/^(?:درس|الدرس|عنوان الدرس)\s*[:：-]?\s*/,""); return; }
+    const hit=GUESS.find(([,re])=>re.test(n));
+    if(hit) bins[hit[0]].push(t); else path.push(t);
   });
-  d.outcomes=out.join("\n"); d.path=path.join("\n");
+  d.outcomes=bins.outcomes.map(t=>{ const m=t.match(/^(.*?)[\s\-–،,]*[(\[]?\s*([\d٠-٩]{1,3})\s*(?:د|دق|دقيقة|دقائق)\s*[)\]]?\s*\.?$/); return m&&m[1]?`${m[1].trim()} | ${toLatinDigits(m[2])}`:t; }).join("\n");
+  d.methods=bins.methods.join("، "); d.resources=bins.resources.join("، ");
+  for(const k of ["homework","gifted","intro","closure","warmup","formative"]) d[k]=bins[k].join(GEO[k]&&(GEO[k].para||GEO[k].single)?" ":"\n");
+  d.path=path.join("\n");
   return d;
 }
 async function fillFromText(auto){
@@ -1197,12 +1233,13 @@ async function fillFromText(auto){
   if(!text){ $("status").textContent="الصق نص التحضير أولًا."; return; }
   let {data,unknown,extra}=parsePrep(text), guessed=false;
   if(!SCHEMA.some(([k])=>data[k])){ data=guessPrep(text); unknown=[]; extra=[]; guessed=true; }
+  else if(unknown.length>=2){ const g=guessPrep(unknown.join("\n")); for(const [k] of SCHEMA) if(!data[k]&&g[k]) data[k]=g[k]; unknown=[]; }
   $("sampleBadge").hidden=true;
   if(typeof applyDefaults==="function") applyDefaults(data);
   setData(data); await render(); showReport(data,unknown,extra);
   if(typeof markDirty==="function") markDirty();
   $("status").textContent=guessed
-    ? "لم أجد عناوين أقسام، فوزّعت النص تقديريًا: العنوان، والأهداف التي تبدأ بـ«أن»، والباقي في مسار الدرس. للتوزيع الدقيق اكتب العناوين أو انسخ النموذج الفارغ."
+    ? "لم أجد عناوين أقسام، فوزّعت كل جملة حسب معناها. راجع الدفتر وعدّل ما يلزم. للتوزيع الدقيق اطلب من Gemini أن يكتب بعناوين الدفتر."
     : (auto?"وُزّع النص تلقائيًا. ":"تمّت التعبئة. ")+"راجع الدفتر، ويمكنك تعديل أي قسم من «مراجعة الحقول وتعديلها».";
   if(auto&&typeof toast==="function") toast(guessed?"وُزّع النص تقديريًا. راجعه.":"وُزّع النص على الدفتر تلقائيًا.");
 }
