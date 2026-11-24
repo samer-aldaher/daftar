@@ -1208,12 +1208,20 @@ async function fillFromText(auto){
 }
 $("fillBtn").addEventListener("click",()=>fillFromText(false));
 /* pasting fills the sheet at once, no button needed */
-$("prep").addEventListener("paste",e=>{ const t=e.clipboardData?.getData("text")||""; if(t.trim().length>=20) setTimeout(()=>fillFromText(true),0); });
+/* pasting fills the sheet at once, however the text arrives: the paste menu, the keyboard's clipboard bar
+   (Samsung keyboard and Gboard insert it as typing), drag-and-drop or dictation of a long block */
+let prepLen=$("prep").value.length, autoTimer=null;
+const autoFill=()=>{ clearTimeout(autoTimer); autoTimer=setTimeout(()=>fillFromText(true),350); };
+$("prep").addEventListener("paste",e=>{ const t=e.clipboardData?.getData("text")||""; if(t.trim().length>=20) autoFill(); });
+$("prep").addEventListener("input",e=>{
+  const n=$("prep").value.length, grew=n-prepLen; prepLen=n;
+  if(e.inputType==="insertFromPaste"||e.inputType==="insertFromDrop"||grew>=40) autoFill();
+});
 $("copyTplBtn").addEventListener("click", async ()=>{
   try{ await navigator.clipboard.writeText(PREP_TEMPLATE); $("status").textContent="نُسخ النموذج. الصقه في أي مكان واكتب تحضيرك تحت العناوين."; }
   catch(e){ $("prep").value=PREP_TEMPLATE; $("sampleBadge").hidden=true; $("status").textContent="وُضع النموذج في مربع النص. اكتب تحضيرك تحت العناوين."; }
 });
-$("clearBtn").addEventListener("click",()=>{ $("prep").value=""; $("sampleBadge").hidden=true; $("prep").focus(); });
+$("clearBtn").addEventListener("click",()=>{ $("prep").value=""; prepLen=0; $("sampleBadge").hidden=true; $("prep").focus(); });
 /* text size */
 try{ const z=design.global?.sizePt; if(z) $("sizeSel").value=String(z); }catch(e){}
 $("sizeSel").addEventListener("change",()=>{ const v=Number($("sizeSel").value); if(v===14) delete design.global.sizePt; else design.global.sizePt=v; saveDesign(); render(); });
