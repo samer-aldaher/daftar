@@ -1266,7 +1266,22 @@ async function printPages(urls){
   window.print();
 }
 $("printBtn").addEventListener("click", async ()=>{ await render(); await printPages([canvas.toDataURL("image/jpeg",0.95)]); });
-if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
+/* offline support + updates: a newer version takes over by itself and the page reloads once (the draft is saved first) */
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  const hadController=!!navigator.serviceWorker.controller; let reloaded=false;
+  navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(reg=>{
+    const check=()=>reg.update().catch(()=>{});
+    document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") check(); });
+    setInterval(check,30*60*1000);
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(!hadController||reloaded) return; reloaded=true;
+    try{ if(typeof lessonFromEditor==="function") localStorage.setItem("lp-draft",JSON.stringify({...lessonFromEditor(),currentId,pendingSlot,dirty})); }catch(e){}
+    try{ sessionStorage.setItem("lp-updated","1"); }catch(e){}
+    location.reload();
+  });
+  try{ if(sessionStorage.getItem("lp-updated")){ sessionStorage.removeItem("lp-updated"); setTimeout(()=>typeof toast==="function"&&toast("تم تحديث التطبيق إلى أحدث نسخة ✓"),800); } }catch(e){}
+}
 loadFont().then(render);
 document.fonts?.ready?.then(()=>render());
 
